@@ -20,21 +20,47 @@ public class DiscordNickCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage("§6Usage: §e/discordnick <discord|minecraft|off> OR /discordnick sync");
+            sender.sendMessage("§6Usage: §e/discordnick <discord|minecraft|off> OR /discordnick sync [all|<username>]");
             return true;
         }
 
         String subCommand = args[0].toLowerCase();
 
+        // Handle "/discordnick sync"
         if (subCommand.equals("sync")) {
-            if (!sender.hasPermission("discordsync.admin")) {
-                sender.sendMessage("§cYou do not have permission to use this command.");
+            if (args.length == 1) {
+                // Regular players: sync their own nickname
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage("Only players can sync their own nickname.");
+                    return true;
+                }
+                syncPlayer((Player) sender, sender);
                 return true;
             }
-            handleSyncCommand(sender);
+
+            // Handle "/discordnick sync all" or "/discordnick sync <player>"
+            if (!sender.hasPermission("discordsync.admin")) {
+                sender.sendMessage("§cYou do not have permission to use this command");
+                return true;
+            }
+
+            if (args[1].equalsIgnoreCase("all")) {
+                syncAllPlayers(sender);
+                return true;
+            }
+
+            // Try to find the specific player
+            Player targetPlayer = Bukkit.getPlayerExact(args[1]);
+            if (targetPlayer == null) {
+                sender.sendMessage("§cPlayer not found or offline.");
+                return true;
+            }
+
+            syncPlayer(targetPlayer, sender);
             return true;
         }
 
+        // Handle "/discordnick <discord|minecraft|off>"
         if (!(sender instanceof Player)) {
             sender.sendMessage("Only players can set their own sync mode.");
             return true;
@@ -66,9 +92,40 @@ public class DiscordNickCommand implements CommandExecutor {
     }
 
     /**
-     * Handles `/discordnick sync` for all players (Admin Only).
+     * Syncs a specific player's nickname.
      */
-    private void handleSyncCommand(CommandSender sender) {
+    private void syncPlayer(Player player, CommandSender sender) {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            UUID uuid = player.getUniqueId();
+            String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(uuid);
+
+            if (discordId == null) {
+                sender.sendMessage("§c" + player.getName() + " has not linked their Discord account.");
+                return;
+            }
+
+            SyncMode syncMode = SyncMode.fromString(plugin.getDataManager().getSyncMode(uuid));
+
+            switch (syncMode) {
+                case MINECRAFT:
+                    plugin.syncMinecraftToDiscord(player, discordId);
+                    sender.sendMessage("§aSynchronized §6" + player.getName() + "§a (Minecraft → Discord).");
+                    break;
+                case DISCORD:
+                    plugin.syncDiscordToMinecraft(player, discordId);
+                    sender.sendMessage("§aSynchronized §6" + player.getName() + "§a (Discord → Minecraft).");
+                    break;
+                case OFF:
+                    sender.sendMessage("§6" + player.getName() + "§e has syncing disabled.");
+                    break;
+            }
+        });
+    }
+
+    /**
+     * Syncs all online players' nicknames.
+     */
+    private void syncAllPlayers(CommandSender sender) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             int syncedCount = 0;
 
