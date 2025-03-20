@@ -37,6 +37,7 @@ public class DiscordNickSync extends JavaPlugin {
 
         // Register commands
         getCommand("discordnick").setExecutor(new DiscordNickCommand(this));
+        getCommand("discordnick").setTabCompleter(new DiscordNickTabCompleter());
 
         // Register event listeners
         getServer().getPluginManager().registerEvents(new SyncListener(this), this);

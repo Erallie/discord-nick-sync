@@ -4,7 +4,10 @@ main: com.gozarproductions.discordnicksync.DiscordNickSync
 commands:
   discordnick:
     description: Main command for DiscordNickSync.
-    usage: /discordnick <discord|minecraft|off> OR /discordnick sync [all|<username>]
+    usage: |
+      - /discordnick <discord|minecraft|off>
+      - /discordnick sync [all|<username>]
+      - /discordnick reload
     permission: discordnick.use
 permissions:
   discordsync.use:
