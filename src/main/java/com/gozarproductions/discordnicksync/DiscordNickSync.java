@@ -155,9 +155,9 @@ public class DiscordNickSync extends JavaPlugin {
                         player.sendMessage(
                             getMessage(
                                 "messages.nickname_updated",
-                                "{to}", "Discord",
-                                "{from}", "Minecraft",
-                                "{nickname}", newName
+                                "to", "Discord",
+                                "from", "Minecraft",
+                                "nickname", newName
                             ) + "\n \n" +
                             getMessage("message.sync_notif")
                         );
@@ -214,9 +214,9 @@ public class DiscordNickSync extends JavaPlugin {
                         player.sendMessage(
                             getMessage(
                                 "messages.nickname_updated",
-                                "{to}", "Minecraft",
-                                "{from}", "Discord",
-                                "{nickname}", formattedNick
+                                "to", "Minecraft",
+                                "from", "Discord",
+                                "nickname", formattedNick
                             ) + "\n \n" +
                             getMessage("message.sync_notif")
                         );

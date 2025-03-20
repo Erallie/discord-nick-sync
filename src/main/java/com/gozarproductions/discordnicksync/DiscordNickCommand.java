@@ -63,7 +63,7 @@ public class DiscordNickCommand implements CommandExecutor {
             // Try to find the specific player
             Player targetPlayer = Bukkit.getPlayerExact(args[1]);
             if (targetPlayer == null) {
-                sender.sendMessage(plugin.getMessage("errors.player_not_found", "{player}", args[1]));
+                sender.sendMessage(plugin.getMessage("errors.player_not_found", "player", args[1]));
                 return true;
             }
 
@@ -87,16 +87,16 @@ public class DiscordNickCommand implements CommandExecutor {
 
         switch (mode) {
             case MINECRAFT:
-                player.sendMessage(plugin.getMessage("messages.mode_set", "{to}", "Discord", "{from}", "Minecraft"));
+                player.sendMessage(plugin.getMessage("messages.mode_set", "to", "Discord", "from", "Minecraft"));
                 break;
             case DISCORD:
-                player.sendMessage(plugin.getMessage("messages.mode_set", "{to}", "Minecraft", "{from}", "Discord"));
+                player.sendMessage(plugin.getMessage("messages.mode_set", "to", "Minecraft", "from", "Discord"));
                 break;
             case OFF:
                 player.sendMessage(plugin.getMessage("messages.mode_off"));
                 break;
             default:
-                player.sendMessage(plugin.getMessage("errors.invalid_command", "{usage}", plugin.getMessage("messages.usage")));
+                player.sendMessage(plugin.getMessage("errors.invalid_command", "usage", plugin.getMessage("messages.usage")));
                 break;
         }
 
@@ -118,34 +118,26 @@ public class DiscordNickCommand implements CommandExecutor {
 
             SyncMode syncMode = SyncMode.fromString(plugin.getDataManager().getSyncMode(uuid));
 
-            
-            String from;
-            String to;
-
             switch (syncMode) {
                 case MINECRAFT:
-                    from = "Minecraft";
-                    to = "Discord";
                     plugin.syncMinecraftToDiscord(player, discordId);
                     sender.sendMessage(
                         plugin.getMessage(
                                 "messages.sync_success", 
-                                "{player}", player.getName(), 
-                                "{from}", from, 
-                                "{to}", to
+                                "player", player.getName(), 
+                                "from", "Minecraft", 
+                                "to", "Discord"
                             )
                         );
                     break;
                 case DISCORD:
-                    from = "Discord";
-                    to = "Minecraft";
                     plugin.syncDiscordToMinecraft(player, discordId);
                     sender.sendMessage(
                         plugin.getMessage(
                                 "messages.sync_success", 
-                                "{player}", player.getName(), 
-                                "{from}", from, 
-                                "{to}", to
+                                "player", player.getName(), 
+                                "from", "Discord", 
+                                "to", "Minecraft"
                             )
                         );
                     break;
@@ -153,7 +145,7 @@ public class DiscordNickCommand implements CommandExecutor {
                     sender.sendMessage(
                         plugin.getMessage(
                             "messages.sync_disabled", 
-                            "{player}", player.getName()
+                            "player", player.getName()
                             )
                         );
                     break;
@@ -190,7 +182,7 @@ public class DiscordNickCommand implements CommandExecutor {
                 }
             }
 
-            sender.sendMessage(plugin.getMessage("messages.sync_all_success", "{count}", String.valueOf(syncedCount)));
+            sender.sendMessage(plugin.getMessage("messages.sync_all_success", "count", String.valueOf(syncedCount)));
         });
     }
 }
