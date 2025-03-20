@@ -1,0 +1,16 @@
+name: DiscordNickSync
+version: 1.0
+main: com.gozarproductions.discordnicksync.DiscordNickSync
+api-version: 1.21
+commands:
+  discordnick:
+    description: Main command for DiscordNickSync.
+    usage: /discordnick <discord|minecraft|off|sync>
+    permission: discordnick.use
+permissions:
+  discordsync.use:
+    description: Allows players to set their own Discord nickname sync mode.
+    default: true
+  discordsync.admin:
+    description: Allows admins to run /discordnick sync for all players.
+    default: op
