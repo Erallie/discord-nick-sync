@@ -79,6 +79,7 @@ public class DiscordNickCommand implements CommandExecutor {
 
         Player player = (Player) sender;
         UUID playerUUID = player.getUniqueId();
+        String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(playerUUID);
 
         SyncMode mode = SyncMode.fromString(subCommand.toUpperCase());
         plugin.getDataManager().setSyncMode(playerUUID, mode.name());
@@ -88,11 +89,11 @@ public class DiscordNickCommand implements CommandExecutor {
         switch (mode) {
             case MINECRAFT:
                 player.sendMessage(plugin.getMessage("messages.mode_set", "to", "Discord", "from", "Minecraft"));
-                syncPlayer(player, player);
+                plugin.syncMinecraftToDiscord(player, discordId);
                 break;
             case DISCORD:
                 player.sendMessage(plugin.getMessage("messages.mode_set", "to", "Minecraft", "from", "Discord"));
-                syncPlayer(player, player);
+                plugin.syncMinecraftToDiscord(player, discordId);
                 break;
             case OFF:
                 player.sendMessage(plugin.getMessage("messages.mode_off"));
