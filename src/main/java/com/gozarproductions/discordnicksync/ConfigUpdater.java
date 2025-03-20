@@ -23,7 +23,7 @@ public class ConfigUpdater {
         String storedVersion = plugin.getConfig().getString("settings.plugin-version", "0.0");
 
         if (!currentVersion.equals(storedVersion)) {
-            plugin.getLogger().info("[DiscordNickSync] Detected new version (" + currentVersion + "). Updating configuration files...");
+            plugin.getLogger().info("Detected new version (" + currentVersion + "). Updating configuration files...");
 
             updateYamlFile("config.yml");
             updateYamlFile("language.yml");
@@ -64,9 +64,9 @@ public class ConfigUpdater {
         if (updated) {
             try {
                 currentConfig.save(file);
-                plugin.getLogger().info("[DiscordNickSync] Updated " + fileName + " with new settings.");
+                plugin.getLogger().info("Updated " + fileName + " with new settings.");
             } catch (IOException e) {
-                plugin.getLogger().warning("[DiscordNickSync] Could not update " + fileName + ": " + e.getMessage());
+                plugin.getLogger().warning("Could not update " + fileName + ": " + e.getMessage());
             }
         }
     }
