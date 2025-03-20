@@ -104,12 +104,12 @@ public class ConfigUpdater {
                 if (updated) {
                     try (Writer writer = new FileWriter(dataFile)) {
                         gson.toJson(currentData, writer);
-                        plugin.getLogger().info("[DiscordNickSync] Updated data.json with new settings.");
+                        plugin.getLogger().info("Updated data.json with new settings.");
                     }
                 }
             }
         } catch (IOException e) {
-            plugin.getLogger().warning("[DiscordNickSync] Could not update data.json: " + e.getMessage());
+            plugin.getLogger().warning("Could not update data.json: " + e.getMessage());
         }
     }
 }
