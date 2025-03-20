@@ -8,6 +8,6 @@ settings:
   # Will be removed from the end of your Minecraft nickname before syncing to Discord.
   essentials-nick-suffix: "§r"
   # What name to use by default for both Minecraft and Discord
-  # This can be changed by the player as long as they have the permission discordnick.sync
+  # This can be changed by the player as long as they have the permission discordnick.use
   # Can either be "minecraft", "discord", or "off"
   default-sync: discord
