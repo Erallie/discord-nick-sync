@@ -73,8 +73,7 @@ public class DiscordNickSync extends JavaPlugin {
 
 
     public String getColor(String key) {
-        String color = languageConfig.getString("colors." + key, "");
-        return ChatColor.translateAlternateColorCodes('&', color);
+        return languageConfig.getString("colors." + key, "");
     }
 
     public String getMessage(String key, String... replacements) {
