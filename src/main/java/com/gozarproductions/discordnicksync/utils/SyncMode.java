@@ -1,4 +1,4 @@
-package com.gozarproductions.discordnicksync;
+package com.gozarproductions.discordnicksync.utils;
 
 import org.bukkit.Bukkit;
 

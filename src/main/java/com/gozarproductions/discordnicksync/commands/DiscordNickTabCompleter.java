@@ -1,4 +1,4 @@
-package com.gozarproductions.discordnicksync;
+package com.gozarproductions.discordnicksync.commands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;

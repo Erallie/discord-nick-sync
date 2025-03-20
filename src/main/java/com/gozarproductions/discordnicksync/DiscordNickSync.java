@@ -10,6 +10,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.earth2me.essentials.Essentials;
 
+import com.gozarproductions.discordnicksync.commands.DiscordNickCommand;
+import com.gozarproductions.discordnicksync.commands.DiscordNickTabCompleter;
+import com.gozarproductions.discordnicksync.listeners.SyncListener;
+import com.gozarproductions.discordnicksync.managers.ConfigUpdater;
+import com.gozarproductions.discordnicksync.managers.DataManager;
+import com.gozarproductions.discordnicksync.managers.LanguageManager;
+import com.gozarproductions.discordnicksync.managers.UpdateChecker;
+
 import java.util.HashMap;
 import java.util.Map;
 

@@ -1,4 +1,4 @@
-package com.gozarproductions.discordnicksync;
+package com.gozarproductions.discordnicksync.commands;
 
 import github.scarsz.discordsrv.DiscordSRV;
 import org.bukkit.Bukkit;
@@ -6,6 +6,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import com.gozarproductions.discordnicksync.DiscordNickSync;
+import com.gozarproductions.discordnicksync.utils.SyncMode;
 
 import java.util.UUID;
 
