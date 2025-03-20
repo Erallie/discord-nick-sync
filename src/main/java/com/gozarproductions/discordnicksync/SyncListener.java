@@ -40,6 +40,8 @@ public class SyncListener extends ListenerAdapter implements Listener {
         Player player = Bukkit.getPlayer(event.getPlayer().getUniqueId());
         if (player != null) {
             syncPlayer(player, event.getUser().getId());
+        } else {
+            plugin.getLogger().warning("Cannot sync newly linked account: player is null.");
         }
     }
 
