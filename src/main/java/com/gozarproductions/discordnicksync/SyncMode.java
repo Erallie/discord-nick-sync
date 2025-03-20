@@ -16,7 +16,7 @@ public enum SyncMode {
             return SyncMode.valueOf(mode.toUpperCase()); // Convert input to uppercase before matching
         } catch (IllegalArgumentException e) {
             Bukkit.getLogger().warning("Invalid sync mode: '" + mode + "'. Defaulting to OFF.");
-            return OFF; // Default to discord if an invalid value is provided
+            return null;
         }
     }
 
