@@ -32,7 +32,7 @@ public class DiscordNickCommand implements CommandExecutor {
                 return true;
             }
 
-            reloadPluginConfig();
+            plugin.reloadPluginConfig();
             sender.sendMessage("§eDiscordNickSync configuration reloaded.");
             return true;
         }
@@ -164,10 +164,5 @@ public class DiscordNickCommand implements CommandExecutor {
 
             sender.sendMessage("§aSynchronized " + syncedCount + " players.");
         });
-    }
-
-    public void reloadPluginConfig() {
-        plugin.reloadConfig();
-        plugin.getLogger().info("Configuration reloaded.");
     }
 }

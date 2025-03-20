@@ -28,7 +28,7 @@ public class DataManager {
     /**
      * Loads the sync preferences from `data.json` into memory.
      */
-    private void loadData() {
+    public void loadData() {
         if (!dataFile.exists()) {
             saveData(); // Create the file if it doesn't exist
             return;
