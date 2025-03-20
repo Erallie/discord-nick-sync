@@ -16,7 +16,7 @@ messages:
   sync_disabled: "{h}{player}{d} has syncing disabled."
   nickname_updated: "{d}Your {to} nickname has been updated to {h}{nickname}{d}."
   mode_set: "{e}Your {to} nickname will now use your {h}{from} {e}nickname"
-  sync_notif: "{d}If you would like to configure whether to use your Discord nickname or your Essentials nickname for your synced nickname, or disable syncing, type {h}/discordnick{d}"
+  sync_notif: "{d}If you would like to how your nick is synced, type {h}/discordnick"
   mode_off: "{e}Your nicknames will no longer be synced between Minecraft and Discord."
   usage: |
     {h}Usage:
