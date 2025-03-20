@@ -3,6 +3,8 @@ package com.gozarproductions.discordnicksync;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.User;
+import github.scarsz.discordsrv.dependencies.jda.api.exceptions.HierarchyException;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -100,7 +102,23 @@ public class DiscordNickSync extends JavaPlugin {
         // Only update if the nickname is different
         if (!formattedNick.equals(minecraftNickname)) {
             String newName = minecraftNickname.substring(prefix.length(), minecraftNickname.length() - suffix.length());
-            DiscordSRV.getPlugin().getJda().getGuilds().get(0).modifyNickname(discordMember, newName).queue();
+            DiscordSRV.getPlugin().getJda().getGuilds().get(0)
+                .modifyNickname(discordMember, newName)
+                .queue(
+                    success -> {
+                        getLogger().info("Updated Discord nickname for " + player.getName() + " to " + newName);
+                        player.sendMessage("§eYour Discord nickname has been updated to §6" + newName);
+                    },
+                    failure -> {
+                        if (failure instanceof HierarchyException) {
+                            getLogger().warning("Cannot modify nickname for " + player.getName() + 
+                                " (Discord role hierarchy issue). Ensure the bot has permission and is above the user in the role list.");
+                        } else {
+                            getLogger().warning("Failed to update Discord nickname for " + player.getName() +
+                                ": " + failure.getMessage());
+                        }
+                    }
+                );
             player.sendMessage("§eYour Discord nickname has been updated to §6" + newName);
         } else {
             getLogger().info("Did not sync Minecraft nickname to Discord for " + player.getDisplayName() + " because they already match.");
