@@ -15,9 +15,9 @@ messages:
   sync_all_success: "{d}Synced {h}{count} {d}players."
   sync_disabled: "{h}{player}{d} has syncing disabled."
   nickname_updated: "{d}Your {to} nickname has been updated to {h}{nickname}{d}."
-  mode_set: "{e}Your {to} nickname will now use your {h}{from} {e}nickname"
-  sync_notif: "{d}If you would like to how your nick is synced, type {h}/discordnick"
-  mode_off: "{e}Your nicknames will no longer be synced between Minecraft and Discord."
+  mode_set: "{d}Your {to} nickname will now use your {h}{from} {d}nickname"
+  sync_notif: "{d}If you would like to configure how your nick is synced, type {h}/discordnick"
+  mode_off: "{d}Your nicknames will no longer be synced between Minecraft and Discord."
   usage: |
     {h}Usage:
     {d}- {h}/discordnick {d}<discord|minecraft|off>
