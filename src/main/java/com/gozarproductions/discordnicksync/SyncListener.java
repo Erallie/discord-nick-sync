@@ -27,6 +27,18 @@ public class SyncListener extends ListenerAdapter implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        // Check if the player is an admin
+        if (player.hasPermission("discordsync.admin")) {
+            // Check if an update is available
+            UpdateChecker updateChecker = plugin.updateChecker;
+            String latestVersion = updateChecker.latestVersion;
+            String downloadUrl = updateChecker.downloadUrl;
+
+            if (latestVersion != null) {
+                updateChecker.notifyAdmins(latestVersion, downloadUrl);
+            }
+        }
+
         UUID uuid = player.getUniqueId();
         String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(uuid);
 

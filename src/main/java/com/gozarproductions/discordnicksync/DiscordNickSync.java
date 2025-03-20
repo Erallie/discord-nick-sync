@@ -23,6 +23,7 @@ public class DiscordNickSync extends JavaPlugin {
     private DataManager dataManager;
     private File languageFile;
     private FileConfiguration languageConfig;
+    public UpdateChecker updateChecker;
 
     @Override
     public void onEnable() {
@@ -30,9 +31,14 @@ public class DiscordNickSync extends JavaPlugin {
 
         // Save default config
         saveDefaultConfig();
+
         // Create ConfigUpdater and check for updates
         ConfigUpdater configUpdater = new ConfigUpdater(this);
         configUpdater.checkAndUpdateConfigs();
+        
+        // Run the Update Checker using GitHub API
+        updateChecker = new UpdateChecker(this, "Erallie", "discord-nick-sync");
+        updateChecker.checkForUpdates();
 
         reloadConfig();
         
@@ -73,7 +79,8 @@ public class DiscordNickSync extends JavaPlugin {
 
 
     public String getColor(String key) {
-        return languageConfig.getString("colors." + key, "");
+        String color = languageConfig.getString("colors." + key, "");
+        return ChatColor.translateAlternateColorCodes('&', color);
     }
 
     public String getMessage(String key, String... replacements) {
@@ -246,5 +253,7 @@ public class DiscordNickSync extends JavaPlugin {
         loadLanguageFile();
         dataManager.loadData(); // Reload data.json if needed
         getLogger().info("Configuration reloaded.");
+        // Run the Update Checker using GitHub API
+        updateChecker.checkForUpdates();
     }
 }
