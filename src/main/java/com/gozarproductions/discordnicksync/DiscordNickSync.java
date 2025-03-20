@@ -33,7 +33,7 @@ public class DiscordNickSync extends JavaPlugin {
         // Create ConfigUpdater and check for updates
         ConfigUpdater configUpdater = new ConfigUpdater(this);
         configUpdater.checkAndUpdateConfigs();
-        
+
         reloadConfig();
         
         // Load language.yml
@@ -163,7 +163,7 @@ public class DiscordNickSync extends JavaPlugin {
                                 "from", "Minecraft",
                                 "nickname", newName
                             ) + "\n \n" +
-                            getMessage("message.sync_notif")
+                            getMessage("messages.sync_notif")
                         );
                     },
                     failure -> {
@@ -222,7 +222,7 @@ public class DiscordNickSync extends JavaPlugin {
                                 "from", "Discord",
                                 "nickname", formattedNick
                             ) + "\n \n" +
-                            getMessage("message.sync_notif")
+                            getMessage("messages.sync_notif")
                         );
                     } catch (Exception e) {
                         getLogger().warning("Failed to update nickname for " + player.getName());
