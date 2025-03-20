@@ -24,9 +24,21 @@ import java.util.Map;
 public class DiscordNickSync extends JavaPlugin {
 
     private Essentials essentials;
-    public DataManager dataManager;
-    public UpdateChecker updateChecker;
-    public LanguageManager languageManager;
+    private DataManager dataManager;
+    private UpdateChecker updateChecker;
+    private LanguageManager languageManager;
+
+    public DataManager getDataManager() {
+        return dataManager;
+    }
+    
+    public UpdateChecker getUpdateChecker() {
+        return updateChecker;
+    }
+
+    public LanguageManager getLanguageManager() {
+        return languageManager;
+    }
 
     @Override
     public void onEnable() {

@@ -57,8 +57,8 @@ public class UpdateChecker {
     public void notifyAdmins(String latestVersion, String downloadUrl) {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.hasPermission("discordsync.admin")) {
-                player.sendMessage(plugin.languageManager.getColor("highlight") + "[DiscordNickSync] " + plugin.languageManager.getColor("default") + "A new update is available: " + plugin.languageManager.getColor("highlight") + latestVersion);
-                player.sendMessage(plugin.languageManager.getColor("default") + "Download: " + plugin.languageManager.getColor("highlight") + downloadUrl);
+                player.sendMessage(plugin.getLanguageManager().getColor("highlight") + "[DiscordNickSync] " + plugin.getLanguageManager().getColor("default") + "A new update is available: " + plugin.getLanguageManager().getColor("highlight") + latestVersion);
+                player.sendMessage(plugin.getLanguageManager().getColor("default") + "Download: " + plugin.getLanguageManager().getColor("highlight") + downloadUrl);
             }
         }
     }

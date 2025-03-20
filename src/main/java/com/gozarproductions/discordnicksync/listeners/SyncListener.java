@@ -34,7 +34,7 @@ public class SyncListener extends ListenerAdapter implements Listener {
         // Check if the player is an admin
         if (player.hasPermission("discordsync.admin")) {
             // Check if an update is available
-            UpdateChecker updateChecker = plugin.updateChecker;
+            UpdateChecker updateChecker = plugin.getUpdateChecker();
             String latestVersion = updateChecker.latestVersion;
             String downloadUrl = updateChecker.downloadUrl;
 
@@ -98,7 +98,7 @@ public class SyncListener extends ListenerAdapter implements Listener {
     }
 
     private void syncPlayer(Player player, String discordId) {
-        String syncMode = plugin.dataManager.getSyncMode(player.getUniqueId());
+        String syncMode = plugin.getDataManager().getSyncMode(player.getUniqueId());
 
         switch (SyncMode.fromString(syncMode)) {
             case MINECRAFT:
