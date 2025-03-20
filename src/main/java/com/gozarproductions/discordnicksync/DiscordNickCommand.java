@@ -20,7 +20,7 @@ public class DiscordNickCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage("§6Usage: §e/discordnick <discord|minecraft|off> OR /discordnick sync [all|<username>]");
+            sender.sendMessage(plugin.getMessage("messages.usage"));
             return true;
         }
 
@@ -28,12 +28,12 @@ public class DiscordNickCommand implements CommandExecutor {
 
         if (subCommand.equals("reload")) {
             if (!sender.hasPermission("discordsync.admin")) {
-                sender.sendMessage("§cYou do not have permission to use this command.");
+                sender.sendMessage(plugin.getMessage("errors.no_permission"));
                 return true;
             }
 
             plugin.reloadPluginConfig();
-            sender.sendMessage("§eDiscordNickSync configuration reloaded.");
+            sender.sendMessage(plugin.getMessage("messages.reload_success"));
             return true;
         }
 
@@ -42,7 +42,7 @@ public class DiscordNickCommand implements CommandExecutor {
             if (args.length == 1) {
                 // Regular players: sync their own nickname
                 if (!(sender instanceof Player)) {
-                    sender.sendMessage("§cOnly players can sync their own nickname.");
+                    sender.sendMessage(plugin.getMessage("errors.only_players"));
                     return true;
                 }
                 syncPlayer((Player) sender, sender);
@@ -51,7 +51,7 @@ public class DiscordNickCommand implements CommandExecutor {
 
             // Handle "/discordnick sync all" or "/discordnick sync <player>"
             if (!sender.hasPermission("discordsync.admin")) {
-                sender.sendMessage("§cYou do not have permission to use this command.");
+                sender.sendMessage(plugin.getMessage("errors.no_permission"));
                 return true;
             }
 
@@ -63,7 +63,7 @@ public class DiscordNickCommand implements CommandExecutor {
             // Try to find the specific player
             Player targetPlayer = Bukkit.getPlayerExact(args[1]);
             if (targetPlayer == null) {
-                sender.sendMessage("§cPlayer not found or offline.");
+                sender.sendMessage(plugin.getMessage("errors.player_not_found", "{player}", args[1]));
                 return true;
             }
 
@@ -73,7 +73,7 @@ public class DiscordNickCommand implements CommandExecutor {
 
         // Handle "/discordnick <discord|minecraft|off>"
         if (!(sender instanceof Player)) {
-            sender.sendMessage("Only players can set their own sync mode.");
+            sender.sendMessage(plugin.getMessage("errors.only_players"));
             return true;
         }
 
@@ -84,18 +84,19 @@ public class DiscordNickCommand implements CommandExecutor {
         plugin.getDataManager().setSyncMode(playerUUID, mode.name());
         plugin.getDataManager().saveData();
 
+
         switch (mode) {
             case MINECRAFT:
-                player.sendMessage("§eYour Discord nickname will now use your §6Minecraft §enickname.");
+                player.sendMessage(plugin.getMessage("messages.mode_set", "{to}", "Discord", "{from}", "Minecraft"));
                 break;
             case DISCORD:
-                player.sendMessage("§eYour Minecraft nickname will now use your §6Discord §enickname.");
+                player.sendMessage(plugin.getMessage("messages.mode_set", "{to}", "Minecraft", "{from}", "Discord"));
                 break;
             case OFF:
-                player.sendMessage("§eYour nickname sync has been disabled.");
+                player.sendMessage(plugin.getMessage("messages.mode_off"));
                 break;
             default:
-                player.sendMessage("§cInvalid option! Use §6`/discordnick <discord|minecraft|off>`§c.");
+                player.sendMessage(plugin.getMessage("errors.invalid_command", "{usage}", plugin.getMessage("messages.usage")));
                 break;
         }
 
@@ -111,23 +112,50 @@ public class DiscordNickCommand implements CommandExecutor {
             String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(uuid);
 
             if (discordId == null) {
-                sender.sendMessage("§c" + player.getName() + " has not linked their Discord account.");
+                sender.sendMessage(plugin.getMessage("errors.sync_not_linked", "player", player.getName()));
                 return;
             }
 
             SyncMode syncMode = SyncMode.fromString(plugin.getDataManager().getSyncMode(uuid));
 
+            
+            String from;
+            String to;
+
             switch (syncMode) {
                 case MINECRAFT:
+                    from = "Minecraft";
+                    to = "Discord";
                     plugin.syncMinecraftToDiscord(player, discordId);
-                    sender.sendMessage("§eSynced §6" + player.getName() + "§e (Minecraft → Discord).");
+                    sender.sendMessage(
+                        plugin.getMessage(
+                                "messages.sync_success", 
+                                "{player}", player.getName(), 
+                                "{from}", from, 
+                                "{to}", to
+                            )
+                        );
                     break;
                 case DISCORD:
+                    from = "Discord";
+                    to = "Minecraft";
                     plugin.syncDiscordToMinecraft(player, discordId);
-                    sender.sendMessage("§eSynced §6" + player.getName() + "§e (Discord → Minecraft).");
+                    sender.sendMessage(
+                        plugin.getMessage(
+                                "messages.sync_success", 
+                                "{player}", player.getName(), 
+                                "{from}", from, 
+                                "{to}", to
+                            )
+                        );
                     break;
                 case OFF:
-                    sender.sendMessage("§6" + player.getName() + "§e has syncing disabled.");
+                    sender.sendMessage(
+                        plugin.getMessage(
+                            "messages.sync_disabled", 
+                            "{player}", player.getName()
+                            )
+                        );
                     break;
             }
         });
@@ -162,7 +190,7 @@ public class DiscordNickCommand implements CommandExecutor {
                 }
             }
 
-            sender.sendMessage("§eSynchronized §6" + syncedCount + " §eplayers.");
+            sender.sendMessage(plugin.getMessage("messages.sync_all_success", "{count}", String.valueOf(syncedCount)));
         });
     }
 }

@@ -1,0 +1,32 @@
+colors:
+  default: "&e"
+  highlight: "&6"
+  error: "&c"
+  error_highlight: "&6"
+messages:
+  # {d} for default color
+  # {h} for highlight color
+  # {e} for error color
+  # {eh} for error highlight
+  # {player} for player minecraft username - where applicable
+  # {nickname} for synced nickname - where applicable
+  reload_success: "{h}DiscordNickSync {d}configuration reloaded."
+  sync_success: "{d}Synced {h}{player} {d}({from} → {to})"
+  sync_all_success: "{d}Synced {h}{count} {d}players."
+  sync_disabled: "{h}{player}{d} has syncing disabled."
+  nickname_updated: "{d}Your {to} nickname has been updated to {h}{nickname}{d}."
+  mode_set: "{e}Your {to} nickname will now use your {h}{from} {e}nickname"
+  sync_notif: "{d}If you would like to configure whether to use your Discord nickname or your Essentials nickname for your synced nickname, or disable syncing, type {h}/discordnick{d}"
+  mode_off: "{e}Your nicknames will no longer be synced between Minecraft and Discord."
+  usage: |
+    {h}Usage:
+    {d}- {h}/discordnick {d}<discord|minecraft|off>
+    {d}- {h}/discordnick sync {d}[all|<username>]
+    {d}- {h}/discordnick reload
+errors:
+  no_permission: "{e}You do not have permission to use this command."
+  player_not_found: "{eh}{player} {e}not found or offline"
+  sync_not_linked: "{eh}{player} {e}has not linked their Discord account."
+  invalid_command: "{e}Invalid command usage!\n \n{usage}"
+  only_players: "{e}Only players can use this command."
+
