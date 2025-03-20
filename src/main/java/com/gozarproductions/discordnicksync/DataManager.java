@@ -82,7 +82,7 @@ public class DataManager {
 
         if (storedMode == null) {
             // If no specific setting exists, get the default sync mode from config.yml
-            String defaultMode = plugin.getConfig().getString("settings.default-sync", "discord");
+            String defaultMode = plugin.getConfig().getString("default-sync", "discord");
             return SyncMode.fromString(defaultMode).name();
         }
         return SyncMode.fromString(storedMode).name();

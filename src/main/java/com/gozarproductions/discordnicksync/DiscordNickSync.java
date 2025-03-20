@@ -56,8 +56,8 @@ public class DiscordNickSync extends JavaPlugin {
 
         if (essentials != null && essentials.getUser(player).getNickname() != null &&
                 !essentials.getUser(player).getNickname().isEmpty()) {
-            result.put("prefix", getConfig().getString("settings.essentials-nick-prefix", ""));
-            result.put("suffix", getConfig().getString("settings.essentials-nick-suffix", ""));
+            result.put("prefix", getConfig().getString("essentials-nick-prefix", ""));
+            result.put("suffix", getConfig().getString("essentials-nick-suffix", ""));
         } else {
             result.put("prefix", "");
             result.put("suffix", "");
@@ -156,5 +156,11 @@ public class DiscordNickSync extends JavaPlugin {
 
     public DataManager getDataManager() {
         return dataManager;
+    }
+
+    public void reloadPluginConfig() {
+        reloadConfig(); // Reload config.yml from disk
+        dataManager.loadData(); // Reload data.json if needed
+        getLogger().info("Configuration reloaded.");
     }
 }
