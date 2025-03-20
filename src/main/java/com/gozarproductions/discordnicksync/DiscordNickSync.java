@@ -5,15 +5,11 @@ import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.User;
 import github.scarsz.discordsrv.dependencies.jda.api.exceptions.HierarchyException;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.earth2me.essentials.Essentials;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,9 +17,8 @@ public class DiscordNickSync extends JavaPlugin {
 
     private Essentials essentials;
     private DataManager dataManager;
-    private File languageFile;
-    private FileConfiguration languageConfig;
     public UpdateChecker updateChecker;
+    public LanguageManager languageManager;
 
     @Override
     public void onEnable() {
@@ -42,8 +37,8 @@ public class DiscordNickSync extends JavaPlugin {
 
         reloadConfig();
         
-        // Load language.yml
-        loadLanguageFile();
+        languageManager = new LanguageManager(this);
+        languageManager.reloadLanguageFile();
 
         // Initialize DataManager to handle `data.json`
         dataManager = new DataManager(getDataFolder(), this);
@@ -64,41 +59,6 @@ public class DiscordNickSync extends JavaPlugin {
         SyncListener syncListener = new SyncListener(this);
         getServer().getPluginManager().registerEvents(syncListener, this);
         DiscordSRV.api.subscribe(syncListener);
-    }
-
-
-    private void loadLanguageFile() {
-        languageFile = new File(getDataFolder(), "language.yml");
-
-        if (!languageFile.exists()) {
-            saveResource("language.yml", false); // Copy default file from JAR
-        }
-
-        languageConfig = YamlConfiguration.loadConfiguration(languageFile);
-    }
-
-
-    public String getColor(String key) {
-        String color = languageConfig.getString("colors." + key, "");
-        return ChatColor.translateAlternateColorCodes('&', color);
-    }
-
-    public String getMessage(String key, String... replacements) {
-        //String message = languageConfig.getString("messages." + key, key);
-        String message = languageConfig.getString(key, key);
-        
-        message = message
-            .replace("{d}", getColor("default"))
-            .replace("{h}", getColor("highlight"))
-            .replace("{e}", getColor("error"))
-            .replace("{eh}", getColor("error_highlight"));
-
-        // Apply placeholders
-        for (int i = 0; i < replacements.length; i += 2) {
-                message = message.replace("{" + replacements[i] + "}", replacements[i + 1]);
-        }
-
-        return ChatColor.translateAlternateColorCodes('&', message);
     }
 
     @Override
@@ -164,13 +124,13 @@ public class DiscordNickSync extends JavaPlugin {
                     success -> {
                         getLogger().info("Updated Discord nickname for " + player.getName() + " to " + newName);
                         player.sendMessage(
-                            getMessage(
+                            languageManager.getMessage(
                                 "messages.nickname_updated",
                                 "to", "Discord",
                                 "from", "Minecraft",
                                 "nickname", newName
                             ) + "\n \n" +
-                            getMessage("messages.sync_notif")
+                            languageManager.getMessage("messages.sync_notif")
                         );
                     },
                     failure -> {
@@ -223,13 +183,13 @@ public class DiscordNickSync extends JavaPlugin {
                     try {
                         essentials.getUser(player).setNickname(discordNickname);
                         player.sendMessage(
-                            getMessage(
+                            languageManager.getMessage(
                                 "messages.nickname_updated",
                                 "to", "Minecraft",
                                 "from", "Discord",
                                 "nickname", formattedNick
                             ) + "\n \n" +
-                            getMessage("messages.sync_notif")
+                            languageManager.getMessage("messages.sync_notif")
                         );
                     } catch (Exception e) {
                         getLogger().warning("Failed to update nickname for " + player.getName());
@@ -250,7 +210,7 @@ public class DiscordNickSync extends JavaPlugin {
     public void reloadPluginConfig() {
         saveDefaultConfig();
         reloadConfig(); // Reload config.yml from disk
-        loadLanguageFile();
+        languageManager.loadLanguageFile();
         dataManager.loadData(); // Reload data.json if needed
         getLogger().info("Configuration reloaded.");
         // Run the Update Checker using GitHub API

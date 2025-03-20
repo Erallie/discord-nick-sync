@@ -20,7 +20,7 @@ public class DiscordNickCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(plugin.getMessage("messages.usage"));
+            sender.sendMessage(plugin.languageManager.getMessage("messages.usage"));
             return true;
         }
 
@@ -28,12 +28,12 @@ public class DiscordNickCommand implements CommandExecutor {
 
         if (subCommand.equals("reload")) {
             if (!sender.hasPermission("discordsync.admin")) {
-                sender.sendMessage(plugin.getMessage("errors.no_permission"));
+                sender.sendMessage(plugin.languageManager.getMessage("errors.no_permission"));
                 return true;
             }
 
             plugin.reloadPluginConfig();
-            sender.sendMessage(plugin.getMessage("messages.reload_success"));
+            sender.sendMessage(plugin.languageManager.getMessage("messages.reload_success"));
             return true;
         }
 
@@ -42,7 +42,7 @@ public class DiscordNickCommand implements CommandExecutor {
             if (args.length == 1) {
                 // Regular players: sync their own nickname
                 if (!(sender instanceof Player)) {
-                    sender.sendMessage(plugin.getMessage("errors.only_players"));
+                    sender.sendMessage(plugin.languageManager.getMessage("errors.only_players"));
                     return true;
                 }
                 syncPlayer((Player) sender, sender);
@@ -51,7 +51,7 @@ public class DiscordNickCommand implements CommandExecutor {
 
             // Handle "/discordnick sync all" or "/discordnick sync <player>"
             if (!sender.hasPermission("discordsync.admin")) {
-                sender.sendMessage(plugin.getMessage("errors.no_permission"));
+                sender.sendMessage(plugin.languageManager.getMessage("errors.no_permission"));
                 return true;
             }
 
@@ -63,7 +63,7 @@ public class DiscordNickCommand implements CommandExecutor {
             // Try to find the specific player
             Player targetPlayer = Bukkit.getPlayerExact(args[1]);
             if (targetPlayer == null) {
-                sender.sendMessage(plugin.getMessage("errors.player_not_found", "player", args[1]));
+                sender.sendMessage(plugin.languageManager.getMessage("errors.player_not_found", "player", args[1]));
                 return true;
             }
 
@@ -73,7 +73,7 @@ public class DiscordNickCommand implements CommandExecutor {
 
         // Handle "/discordnick <discord|minecraft|off>"
         if (!(sender instanceof Player)) {
-            sender.sendMessage(plugin.getMessage("errors.only_players"));
+            sender.sendMessage(plugin.languageManager.getMessage("errors.only_players"));
             return true;
         }
 
@@ -88,18 +88,18 @@ public class DiscordNickCommand implements CommandExecutor {
 
         switch (mode) {
             case MINECRAFT:
-                player.sendMessage(plugin.getMessage("messages.mode_set", "to", "Discord", "from", "Minecraft"));
+                player.sendMessage(plugin.languageManager.getMessage("messages.mode_set", "to", "Discord", "from", "Minecraft"));
                 plugin.syncMinecraftToDiscord(player, discordId);
                 break;
             case DISCORD:
-                player.sendMessage(plugin.getMessage("messages.mode_set", "to", "Minecraft", "from", "Discord"));
+                player.sendMessage(plugin.languageManager.getMessage("messages.mode_set", "to", "Minecraft", "from", "Discord"));
                 plugin.syncMinecraftToDiscord(player, discordId);
                 break;
             case OFF:
-                player.sendMessage(plugin.getMessage("messages.mode_off"));
+                player.sendMessage(plugin.languageManager.getMessage("messages.mode_off"));
                 break;
             default:
-                player.sendMessage(plugin.getMessage("errors.invalid_command", "usage", plugin.getMessage("messages.usage")));
+                player.sendMessage(plugin.languageManager.getMessage("errors.invalid_command", "usage", plugin.languageManager.getMessage("messages.usage")));
                 break;
         }
 
@@ -115,7 +115,7 @@ public class DiscordNickCommand implements CommandExecutor {
             String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(uuid);
 
             if (discordId == null) {
-                sender.sendMessage(plugin.getMessage("errors.sync_not_linked", "player", player.getName()));
+                sender.sendMessage(plugin.languageManager.getMessage("errors.sync_not_linked", "player", player.getName()));
                 return;
             }
 
@@ -125,7 +125,7 @@ public class DiscordNickCommand implements CommandExecutor {
                 case MINECRAFT:
                     plugin.syncMinecraftToDiscord(player, discordId);
                     sender.sendMessage(
-                        plugin.getMessage(
+                        plugin.languageManager.getMessage(
                                 "messages.sync_success", 
                                 "player", player.getName(), 
                                 "from", "Minecraft", 
@@ -136,7 +136,7 @@ public class DiscordNickCommand implements CommandExecutor {
                 case DISCORD:
                     plugin.syncDiscordToMinecraft(player, discordId);
                     sender.sendMessage(
-                        plugin.getMessage(
+                        plugin.languageManager.getMessage(
                                 "messages.sync_success", 
                                 "player", player.getName(), 
                                 "from", "Discord", 
@@ -146,7 +146,7 @@ public class DiscordNickCommand implements CommandExecutor {
                     break;
                 case OFF:
                     sender.sendMessage(
-                        plugin.getMessage(
+                        plugin.languageManager.getMessage(
                             "messages.sync_disabled", 
                             "player", player.getName()
                             )
@@ -185,7 +185,7 @@ public class DiscordNickCommand implements CommandExecutor {
                 }
             }
 
-            sender.sendMessage(plugin.getMessage("messages.sync_all_success", "count", String.valueOf(syncedCount)));
+            sender.sendMessage(plugin.languageManager.getMessage("messages.sync_all_success", "count", String.valueOf(syncedCount)));
         });
     }
 }
