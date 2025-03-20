@@ -2,6 +2,7 @@ package com.gozarproductions.discordnicksync;
 
 import com.earth2me.essentials.User;
 import github.scarsz.discordsrv.DiscordSRV;
+import github.scarsz.discordsrv.api.Subscribe;
 import github.scarsz.discordsrv.api.events.AccountLinkedEvent;
 // import github.scarsz.discordsrv.dependencies.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent;
 import github.scarsz.discordsrv.dependencies.jda.api.hooks.ListenerAdapter;
@@ -34,7 +35,7 @@ public class SyncListener extends ListenerAdapter implements Listener {
         }
     }
 
-    @EventHandler
+    @Subscribe
     public void onAccountLinked(AccountLinkedEvent event) {
         Player player = Bukkit.getPlayer(event.getPlayer().getUniqueId());
         if (player != null) {

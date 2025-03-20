@@ -42,7 +42,9 @@ public class DiscordNickSync extends JavaPlugin {
         getCommand("discordnick").setTabCompleter(new DiscordNickTabCompleter());
 
         // Register event listeners
-        getServer().getPluginManager().registerEvents(new SyncListener(this), this);
+        SyncListener syncListener = new SyncListener(this);
+        getServer().getPluginManager().registerEvents(syncListener, this);
+        DiscordSRV.api.subscribe(syncListener);
     }
 
     @Override
