@@ -80,15 +80,16 @@ public class DiscordNickSync extends JavaPlugin {
     public String getMessage(String key, String... replacements) {
         //String message = languageConfig.getString("messages." + key, key);
         String message = languageConfig.getString(key, key);
+        
+        message = message
+            .replace("{d}", getColor("default"))
+            .replace("{h}", getColor("highlight"))
+            .replace("{e}", getColor("error"))
+            .replace("{eh}", getColor("error_highlight"));
 
         // Apply placeholders
         for (int i = 0; i < replacements.length; i += 2) {
-            message = message
-                .replace("{d}", getColor("default"))
-                .replace("{h}", getColor("highlight"))
-                .replace("{e}", getColor("error"))
-                .replace("{eh}", getColor("error_highlight"))
-                .replace("{" + replacements[i] + "}", replacements[i + 1]);
+                message = message.replace("{" + replacements[i] + "}", replacements[i + 1]);
         }
 
         return ChatColor.translateAlternateColorCodes('&', message);
