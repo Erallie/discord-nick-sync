@@ -18,6 +18,8 @@ public class DiscordNickSync extends JavaPlugin {
     private Essentials essentials;
     private DataManager dataManager;
 
+    private String onSyncMessage = "\n\n§eIf you would like to configure whether to use your Discord nickname or your Essentials nickname for your synced nickname, or disable syncing, type §6/discordnick§e.";
+
     @Override
     public void onEnable() {
         getLogger().info("DiscordNickSync enabled!");
@@ -109,7 +111,7 @@ public class DiscordNickSync extends JavaPlugin {
                 .queue(
                     success -> {
                         getLogger().info("Updated Discord nickname for " + player.getName() + " to " + newName);
-                        player.sendMessage("§eYour Discord nickname has been updated to §6" + newName);
+                        player.sendMessage("§eYour Discord nickname has been updated to §6" + newName + "§e." + onSyncMessage);
                     },
                     failure -> {
                         if (failure instanceof HierarchyException) {
@@ -161,7 +163,7 @@ public class DiscordNickSync extends JavaPlugin {
                 Bukkit.getScheduler().runTask(this, () -> {
                     try {
                         essentials.getUser(player).setNickname(discordNickname);
-                        player.sendMessage("§eYour Minecraft nickname has been updated to §6" + formattedNick);
+                        player.sendMessage("§eYour Minecraft nickname has been updated to §6" + formattedNick + "§e." + onSyncMessage);
                     } catch (Exception e) {
                         getLogger().warning("Failed to update nickname for " + player.getName());
                     }
