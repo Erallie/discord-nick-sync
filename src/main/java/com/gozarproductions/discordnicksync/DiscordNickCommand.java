@@ -88,9 +88,11 @@ public class DiscordNickCommand implements CommandExecutor {
         switch (mode) {
             case MINECRAFT:
                 player.sendMessage(plugin.getMessage("messages.mode_set", "to", "Discord", "from", "Minecraft"));
+                syncPlayer(player, player);
                 break;
             case DISCORD:
                 player.sendMessage(plugin.getMessage("messages.mode_set", "to", "Minecraft", "from", "Discord"));
+                syncPlayer(player, player);
                 break;
             case OFF:
                 player.sendMessage(plugin.getMessage("messages.mode_off"));
