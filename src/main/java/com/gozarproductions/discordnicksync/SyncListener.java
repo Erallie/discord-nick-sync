@@ -94,7 +94,7 @@ public class SyncListener extends ListenerAdapter implements Listener {
     }
 
     private void syncPlayer(Player player, String discordId) {
-        String syncMode = plugin.getDataManager().getSyncMode(player.getUniqueId());
+        String syncMode = plugin.dataManager.getSyncMode(player.getUniqueId());
 
         switch (SyncMode.fromString(syncMode)) {
             case MINECRAFT:

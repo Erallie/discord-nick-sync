@@ -16,7 +16,7 @@ import java.util.Map;
 public class DiscordNickSync extends JavaPlugin {
 
     private Essentials essentials;
-    private DataManager dataManager;
+    public DataManager dataManager;
     public UpdateChecker updateChecker;
     public LanguageManager languageManager;
 
@@ -201,10 +201,6 @@ public class DiscordNickSync extends JavaPlugin {
         } else {
             getLogger().warning("Could not sync Discord nickname to Minecraft for " + player.getDisplayName() + ": essentials could not be found");
         }
-    }
-
-    public DataManager getDataManager() {
-        return dataManager;
     }
 
     public void reloadPluginConfig() {

@@ -82,8 +82,8 @@ public class DiscordNickCommand implements CommandExecutor {
         String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(playerUUID);
 
         SyncMode mode = SyncMode.fromString(subCommand.toUpperCase());
-        plugin.getDataManager().setSyncMode(playerUUID, mode.name());
-        plugin.getDataManager().saveData();
+        plugin.dataManager.setSyncMode(playerUUID, mode.name());
+        plugin.dataManager.saveData();
 
 
         switch (mode) {
@@ -119,7 +119,7 @@ public class DiscordNickCommand implements CommandExecutor {
                 return;
             }
 
-            SyncMode syncMode = SyncMode.fromString(plugin.getDataManager().getSyncMode(uuid));
+            SyncMode syncMode = SyncMode.fromString(plugin.dataManager.getSyncMode(uuid));
 
             switch (syncMode) {
                 case MINECRAFT:
@@ -169,7 +169,7 @@ public class DiscordNickCommand implements CommandExecutor {
 
                 if (discordId == null) continue; // Skip if not linked
 
-                SyncMode syncMode = SyncMode.fromString(plugin.getDataManager().getSyncMode(uuid));
+                SyncMode syncMode = SyncMode.fromString(plugin.dataManager.getSyncMode(uuid));
 
                 switch (syncMode) {
                     case MINECRAFT:
