@@ -1,5 +1,7 @@
 package com.gozarproductions.discordnicksync;
 
+import org.bukkit.Bukkit;
+
 /**
  * Enum representing the available sync modes for nickname synchronization.
  */
@@ -13,7 +15,8 @@ public enum SyncMode {
         try {
             return SyncMode.valueOf(mode.toUpperCase()); // Convert input to uppercase before matching
         } catch (IllegalArgumentException e) {
-            return DISCORD; // Default to discord if an invalid value is provided
+            Bukkit.getLogger().warning("[DiscordNickSync] Invalid sync mode: '" + mode + "'. Defaulting to OFF.");
+            return OFF; // Default to discord if an invalid value is provided
         }
     }
 
