@@ -26,6 +26,17 @@ public class DiscordNickCommand implements CommandExecutor {
 
         String subCommand = args[0].toLowerCase();
 
+        if (subCommand.equals("reload")) {
+            if (!sender.hasPermission("discordsync.admin")) {
+                sender.sendMessage("§cYou do not have permission to use this command.");
+                return true;
+            }
+
+            reloadPluginConfig();
+            sender.sendMessage("§eDiscordNickSync configuration reloaded.");
+            return true;
+        }
+
         // Handle "/discordnick sync"
         if (subCommand.equals("sync")) {
             if (args.length == 1) {
@@ -109,11 +120,11 @@ public class DiscordNickCommand implements CommandExecutor {
             switch (syncMode) {
                 case MINECRAFT:
                     plugin.syncMinecraftToDiscord(player, discordId);
-                    sender.sendMessage("§aSynchronized §6" + player.getName() + "§a (Minecraft → Discord).");
+                    sender.sendMessage("§eSynced §6" + player.getName() + "§e (Minecraft → Discord).");
                     break;
                 case DISCORD:
                     plugin.syncDiscordToMinecraft(player, discordId);
-                    sender.sendMessage("§aSynchronized §6" + player.getName() + "§a (Discord → Minecraft).");
+                    sender.sendMessage("§eSynced §6" + player.getName() + "§e (Discord → Minecraft).");
                     break;
                 case OFF:
                     sender.sendMessage("§6" + player.getName() + "§e has syncing disabled.");
@@ -153,5 +164,10 @@ public class DiscordNickCommand implements CommandExecutor {
 
             sender.sendMessage("§aSynchronized " + syncedCount + " players.");
         });
+    }
+
+    public void reloadPluginConfig() {
+        plugin.reloadConfig();
+        plugin.getLogger().info("Configuration reloaded.");
     }
 }
