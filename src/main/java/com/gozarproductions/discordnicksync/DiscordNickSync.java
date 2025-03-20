@@ -179,6 +179,7 @@ public class DiscordNickSync extends JavaPlugin {
     }
 
     public void reloadPluginConfig() {
+        saveDefaultConfig();
         reloadConfig(); // Reload config.yml from disk
         dataManager.loadData(); // Reload data.json if needed
         getLogger().info("Configuration reloaded.");
