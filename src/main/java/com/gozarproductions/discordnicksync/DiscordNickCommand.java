@@ -42,7 +42,7 @@ public class DiscordNickCommand implements CommandExecutor {
             if (args.length == 1) {
                 // Regular players: sync their own nickname
                 if (!(sender instanceof Player)) {
-                    sender.sendMessage("Only players can sync their own nickname.");
+                    sender.sendMessage("§cOnly players can sync their own nickname.");
                     return true;
                 }
                 syncPlayer((Player) sender, sender);
@@ -51,7 +51,7 @@ public class DiscordNickCommand implements CommandExecutor {
 
             // Handle "/discordnick sync all" or "/discordnick sync <player>"
             if (!sender.hasPermission("discordsync.admin")) {
-                sender.sendMessage("§cYou do not have permission to use this command");
+                sender.sendMessage("§cYou do not have permission to use this command.");
                 return true;
             }
 
@@ -95,7 +95,7 @@ public class DiscordNickCommand implements CommandExecutor {
                 player.sendMessage("§eYour nickname sync has been disabled.");
                 break;
             default:
-                player.sendMessage("§cInvalid option! Use `/discordnick <discord|minecraft|off>`.");
+                player.sendMessage("§cInvalid option! Use §6`/discordnick <discord|minecraft|off>`§c.");
                 break;
         }
 
@@ -162,7 +162,7 @@ public class DiscordNickCommand implements CommandExecutor {
                 }
             }
 
-            sender.sendMessage("§aSynchronized " + syncedCount + " players.");
+            sender.sendMessage("§eSynchronized §6" + syncedCount + " §eplayers.");
         });
     }
 }
