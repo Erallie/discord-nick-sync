@@ -171,7 +171,6 @@ public class DiscordNickSync extends JavaPlugin {
                         }
                     }
                 );
-            player.sendMessage("§eYour Discord nickname has been updated to §6" + newName);
         } else {
             getLogger().info("Did not sync Minecraft nickname to Discord for " + player.getDisplayName() + " because they already match.");
         }
