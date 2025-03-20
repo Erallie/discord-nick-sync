@@ -20,8 +20,8 @@ messages:
   mode_off: "{d}Your nicknames will no longer be synced between Minecraft and Discord."
   usage: |
     {h}Usage:
-    {d}- {h}/discordnick {d}<discord|minecraft|off>
-    {d}- {h}/discordnick sync {d}[all|<username>]
+    {d}- {h}/discordnick {d}< discord | minecraft | off >
+    {d}- {h}/discordnick sync {d}[ all | <username> ]
     {d}- {h}/discordnick reload
 errors:
   no_permission: "{e}You do not have permission to use this command."
