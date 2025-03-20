@@ -30,6 +30,10 @@ public class DiscordNickSync extends JavaPlugin {
 
         // Save default config
         saveDefaultConfig();
+        // Create ConfigUpdater and check for updates
+        ConfigUpdater configUpdater = new ConfigUpdater(this);
+        configUpdater.checkAndUpdateConfigs();
+        
         reloadConfig();
         
         // Load language.yml
