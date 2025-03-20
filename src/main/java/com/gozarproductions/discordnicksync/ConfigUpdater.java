@@ -20,7 +20,7 @@ public class ConfigUpdater {
      */
     public void checkAndUpdateConfigs() {
         String currentVersion = plugin.getDescription().getVersion();
-        String storedVersion = plugin.getConfig().getString("settings.plugin-version", "0.0");
+        String storedVersion = plugin.getConfig().getString("internal.plugin-version", "0.0");
 
         if (!currentVersion.equals(storedVersion)) {
             plugin.getLogger().info("Detected new version (" + currentVersion + "). Updating configuration files...");
@@ -30,7 +30,7 @@ public class ConfigUpdater {
             updateJsonFile();
 
             // Save the new version to config.yml
-            plugin.getConfig().set("settings.plugin-version", currentVersion);
+            plugin.getConfig().set("internal.plugin-version", currentVersion);
             plugin.saveConfig();
         }
     }
