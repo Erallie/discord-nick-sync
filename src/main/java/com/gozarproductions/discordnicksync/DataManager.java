@@ -10,12 +10,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+
 public class DataManager {
+    private final DiscordNickSync plugin;
     private final File dataFile;
     private final Gson gson;
     private Map<UUID, String> syncPreferences;
 
-    public DataManager(File pluginFolder) {
+    public DataManager(File pluginFolder, DiscordNickSync plugin) {
+        this.plugin = plugin;
         this.dataFile = new File(pluginFolder, "data.json");
         this.gson = new GsonBuilder().setPrettyPrinting().create();
         this.syncPreferences = new HashMap<>();
@@ -75,7 +78,14 @@ public class DataManager {
      * Gets the sync mode for a player. Defaults to "discord" if not set.
      */
     public String getSyncMode(UUID uuid) {
-        return SyncMode.fromString(syncPreferences.getOrDefault(uuid, "discord")).name();
+        String storedMode = syncPreferences.get(uuid);
+
+        if (storedMode == null) {
+            // If no specific setting exists, get the default sync mode from config.yml
+            String defaultMode = plugin.getConfig().getString("settings.default-sync", "discord");
+            return SyncMode.fromString(defaultMode).name();
+        }
+        return SyncMode.fromString(storedMode).name();
     }
 
 }

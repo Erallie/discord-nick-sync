@@ -25,7 +25,7 @@ public class DiscordNickSync extends JavaPlugin {
         reloadConfig();
 
         // Initialize DataManager to handle `data.json`
-        dataManager = new DataManager(getDataFolder());
+        dataManager = new DataManager(getDataFolder(), this);
 
         // Hook into Essentials
         if (Bukkit.getPluginManager().isPluginEnabled("Essentials")) {
