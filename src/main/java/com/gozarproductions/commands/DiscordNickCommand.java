@@ -91,7 +91,7 @@ public class DiscordNickCommand implements CommandExecutor {
         SyncMode mode = SyncMode.fromString(subCommand.toUpperCase());
 
         if (mode == null) {
-            player.sendMessage(plugin.getLanguageManager().getMessage("errors.invalid_command") + usage);
+            player.sendMessage(plugin.getLanguageManager().getMessage("errors.invalid_command") + "\n" + usage);
             return true;
         }
         plugin.getDataManager().setSyncMode(playerUUID, mode.name());
@@ -111,7 +111,7 @@ public class DiscordNickCommand implements CommandExecutor {
                 player.sendMessage(plugin.getLanguageManager().getMessage("messages.mode_off"));
                 break;
             default:
-                player.sendMessage(plugin.getLanguageManager().getMessage("errors.invalid_command") + usage);
+                player.sendMessage(plugin.getLanguageManager().getMessage("errors.invalid_command") + "\n" + usage);
                 return true;
         }
 
