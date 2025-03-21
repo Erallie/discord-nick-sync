@@ -149,7 +149,7 @@ public class DiscordNickSync extends JavaPlugin {
                                 "to", "Discord",
                                 "from", "Minecraft",
                                 "nickname", newName
-                            ) + "\n \n" +
+                            ) + "\n" +
                             languageManager.getMessage("messages.sync_notif")
                         );
                     },
@@ -208,7 +208,7 @@ public class DiscordNickSync extends JavaPlugin {
                                 "to", "Minecraft",
                                 "from", "Discord",
                                 "nickname", formattedNick
-                            ) + "\n \n" +
+                            ) + "\n" +
                             languageManager.getMessage("messages.sync_notif")
                         );
                     } catch (Exception e) {
