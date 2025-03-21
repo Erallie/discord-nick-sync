@@ -15,5 +15,8 @@ permissions:
     description: Allows players to set their own Discord nickname sync mode.
     default: true
   discordsync.admin:
-    description: Allows admins to run /discordnick sync for all players.
+    description: |
+      §6Allows admins to:
+      §e- Run §6/discordnick §esync for all players
+      §e- Reload the config
     default: op
