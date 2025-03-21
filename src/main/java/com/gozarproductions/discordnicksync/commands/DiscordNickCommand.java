@@ -23,8 +23,8 @@ public class DiscordNickCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(plugin.getLanguageManager().getMessage("messages.usage"));
-            return true;
+            //sender.sendMessage(plugin.getLanguageManager().getMessage("messages.usage"));
+            return false;
         }
 
         String subCommand = args[0].toLowerCase();
