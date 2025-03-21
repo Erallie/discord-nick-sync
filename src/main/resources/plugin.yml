@@ -5,9 +5,10 @@ commands:
   discordnick:
     description: Main command for DiscordNickSync.
     usage: |
-      - /discordnick <discord|minecraft|off>
-      - /discordnick sync [all|<username>]
-      - /discordnick reload
+      §6Usage:
+      §e- §6/discordnick §e< discord | minecraft | off >
+      §e- §6/discordnick sync §e[ all | <username> ]
+      §e- §6/discordnick reload
     permission: discordnick.use
 permissions:
   discordsync.use:

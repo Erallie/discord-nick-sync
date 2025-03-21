@@ -18,15 +18,11 @@ messages:
   mode_set: "{d}Your {to} nickname will now use your {h}{from} {d}nickname"
   sync_notif: "{d}If you would like to configure how your nick is synced, type {h}/discordnick"
   mode_off: "{d}Your nicknames will no longer be synced between Minecraft and Discord."
-  usage: |
-    {h}Usage:
-    {d}- {h}/discordnick {d}< discord | minecraft | off >
-    {d}- {h}/discordnick sync {d}[ all | <username> ]
-    {d}- {h}/discordnick reload
 errors:
   no_permission: "{e}You do not have permission to use this command."
   player_not_found: "{eh}{player} {e}not found or offline"
   sync_not_linked: "{eh}{player} {e}has not linked their Discord account."
-  invalid_command: "{e}Invalid command usage!\n \n{usage}"
+  # The usage will be shown after this.
+  invalid_command: "{e}Invalid command usage!"
   only_players: "{e}Only players can use this command."
 

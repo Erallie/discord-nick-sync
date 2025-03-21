@@ -84,7 +84,16 @@ public class DiscordNickCommand implements CommandExecutor {
         UUID playerUUID = player.getUniqueId();
         String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(playerUUID);
 
+        String usage = command.getUsage()
+                    .replace("§e", plugin.getLanguageManager().getColor("default"))
+                    .replace("§6", plugin.getLanguageManager().getColor("highlight"));
+
         SyncMode mode = SyncMode.fromString(subCommand.toUpperCase());
+
+        if (mode == null) {
+            player.sendMessage(plugin.getLanguageManager().getMessage("errors.invalid_command") + usage);
+            return true;
+        }
         plugin.getDataManager().setSyncMode(playerUUID, mode.name());
         plugin.getDataManager().saveData();
 
@@ -102,8 +111,8 @@ public class DiscordNickCommand implements CommandExecutor {
                 player.sendMessage(plugin.getLanguageManager().getMessage("messages.mode_off"));
                 break;
             default:
-                player.sendMessage(plugin.getLanguageManager().getMessage("errors.invalid_command", "usage", plugin.getLanguageManager().getMessage("messages.usage")));
-                break;
+                player.sendMessage(plugin.getLanguageManager().getMessage("errors.invalid_command") + usage);
+                return true;
         }
 
         return true;
