@@ -8,21 +8,43 @@ messages:
   # {h} for highlight color
   # {e} for error color
   # {eh} for error highlight
-  # {player} for player minecraft username - where applicable
-  # {nickname} for synced nickname - where applicable
+  
   reload_success: "{h}DiscordNickSync {d}configuration reloaded."
+
+  # Additional placeholders: {player} {from} {to}
   sync_success: "{d}Synced {h}{player} {d}({from} → {to})"
+
+  # Additional placeholders: {count}
   sync_all_success: "{d}Synced {h}{count} {d}players."
+
+  # Additional placeholders: {player}
   sync_disabled: "{h}{player}{d} has syncing disabled."
+
+  # Additional placeholders: {nickname} {from} {to}
   nickname_updated: "{d}Your {to} nickname has been updated to {h}{nickname}{d}."
+
+  # Additional placeholders: {from} {to}
   mode_set: "{d}Your {to} nickname will now use your {h}{from} {d}nickname"
+
   sync_notif: "{d}If you would like to configure how your nick is synced, type {h}/discordnick"
+
   mode_off: "{d}Your nicknames will no longer be synced between Minecraft and Discord."
 errors:
+  # {d} for default color
+  # {h} for highlight color
+  # {e} for error color
+  # {eh} for error highlight
+
   no_permission: "{e}You do not have permission to use this command."
+
+  # Additional placeholders: {player}
   player_not_found: "{eh}{player} {e}not found or offline"
+
+  # Additional placeholders: {player}
   sync_not_linked: "{eh}{player} {e}has not linked their Discord account."
+
   # The usage will be shown after this.
   invalid_command: "{e}Invalid command usage!"
+
   only_players: "{e}Only players can use this command."
 
