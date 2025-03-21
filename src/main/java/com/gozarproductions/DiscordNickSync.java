@@ -1,4 +1,4 @@
-package com.gozarproductions.discordnicksync;
+package com.gozarproductions;
 
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
@@ -8,15 +8,15 @@ import github.scarsz.discordsrv.dependencies.jda.api.exceptions.HierarchyExcepti
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import com.earth2me.essentials.Essentials;
 
-import com.gozarproductions.discordnicksync.commands.DiscordNickCommand;
-import com.gozarproductions.discordnicksync.commands.DiscordNickTabCompleter;
-import com.gozarproductions.discordnicksync.listeners.SyncListener;
-import com.gozarproductions.discordnicksync.managers.ConfigUpdater;
-import com.gozarproductions.discordnicksync.managers.DataManager;
-import com.gozarproductions.discordnicksync.managers.LanguageManager;
-import com.gozarproductions.discordnicksync.managers.UpdateChecker;
+import com.earth2me.essentials.Essentials;
+import com.gozarproductions.commands.DiscordNickCommand;
+import com.gozarproductions.commands.DiscordNickTabCompleter;
+import com.gozarproductions.listeners.SyncListener;
+import com.gozarproductions.managers.ConfigUpdater;
+import com.gozarproductions.managers.DataManager;
+import com.gozarproductions.managers.LanguageManager;
+import com.gozarproductions.managers.UpdateChecker;
 
 import java.util.HashMap;
 import java.util.Map;

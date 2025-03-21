@@ -1,10 +1,10 @@
-package com.gozarproductions.discordnicksync.managers;
+package com.gozarproductions.managers;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import com.gozarproductions.discordnicksync.DiscordNickSync;
+import com.gozarproductions.DiscordNickSync;
 
 import java.io.File;
 

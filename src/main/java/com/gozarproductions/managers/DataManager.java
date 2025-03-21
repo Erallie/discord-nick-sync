@@ -1,10 +1,10 @@
-package com.gozarproductions.discordnicksync.managers;
+package com.gozarproductions.managers;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.gozarproductions.discordnicksync.DiscordNickSync;
-import com.gozarproductions.discordnicksync.utils.SyncMode;
+import com.gozarproductions.DiscordNickSync;
+import com.gozarproductions.utils.SyncMode;
 
 import java.io.*;
 import java.lang.reflect.Type;

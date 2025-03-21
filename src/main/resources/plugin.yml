@@ -1,6 +1,6 @@
 name: DiscordNickSync
 version: 1.0
-main: com.gozarproductions.discordnicksync.DiscordNickSync
+main: com.gozarproductions.DiscordNickSync
 api-version: 1.21
 commands:
   discordnick:

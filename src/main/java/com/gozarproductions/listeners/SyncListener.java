@@ -1,9 +1,9 @@
-package com.gozarproductions.discordnicksync.listeners;
+package com.gozarproductions.listeners;
 
 import com.earth2me.essentials.User;
-import com.gozarproductions.discordnicksync.DiscordNickSync;
-import com.gozarproductions.discordnicksync.managers.UpdateChecker;
-import com.gozarproductions.discordnicksync.utils.SyncMode;
+import com.gozarproductions.DiscordNickSync;
+import com.gozarproductions.managers.UpdateChecker;
+import com.gozarproductions.utils.SyncMode;
 
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.api.Subscribe;

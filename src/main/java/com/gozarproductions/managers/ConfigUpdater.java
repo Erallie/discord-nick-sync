@@ -1,9 +1,9 @@
-package com.gozarproductions.discordnicksync.managers;
+package com.gozarproductions.managers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.gozarproductions.discordnicksync.DiscordNickSync;
+import com.gozarproductions.DiscordNickSync;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
