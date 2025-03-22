@@ -5,23 +5,37 @@ on:
     types: [published]
 
 jobs:
-  upload:
+  upload-to-modrinth:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install GitHub CLI
-        run: sudo apt-get install gh -y
-
-      - name: Download attached JAR asset
-        id: download
+      - name: Get JAR asset name from release
+        id: get-jar
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          release_id=$(gh api repos/${{ github.repository }}/releases/tags/${{ github.ref_name }} --jq '.id')
-          jar_name=$(gh api repos/${{ github.repository }}/releases/$release_id/assets --jq '.[0].name')
+          echo "Fetching release info..."
+          api_url="https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ github.ref_name }}"
+          asset_info=$(curl -s -H "Authorization: token $GH_TOKEN" $api_url)
+          jar_name=$(echo "$asset_info" | jq -r '.assets[] | select(.name | test("^discordnicksync-.*\\.jar$")) | .name' | head -n 1)
+
+          if [ -z "$jar_name" ]; then
+            echo "No .jar asset found in release!"
+            exit 1
+          fi
+
           echo "ASSET_NAME=$jar_name" >> $GITHUB_ENV
-          gh release download ${{ github.ref_name }} --pattern "*.jar"
-          echo "Downloaded: $jar_name"
+
+      - name: Download the JAR from the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Downloading asset: $ASSET_NAME"
+          download_url="https://api.github.com/repos/${{ github.repository }}/releases/assets"
+          asset_id=$(curl -s -H "Authorization: token $GH_TOKEN" https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ github.ref_name }} | jq '.assets[] | select(.name=="'"$ASSET_NAME"'") | .id')
+          curl -L -H "Authorization: token $GH_TOKEN" -H "Accept: application/octet-stream" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/assets/$asset_id" \
+            -o "$ASSET_NAME"
 
       - name: Upload to Modrinth
         uses: RubixDev/modrinth-upload@v1
@@ -33,5 +47,5 @@ jobs:
           changelog: ${{ github.event.release.body }}
           file_path: ${{ env.ASSET_NAME }}
           game_versions: '["1.20", "1.21"]'
-          loaders: '["spigot", "paper"]'
-          featured: false
+          loaders: '["spigot", "paper", "purpur"]'
+          featured: true
