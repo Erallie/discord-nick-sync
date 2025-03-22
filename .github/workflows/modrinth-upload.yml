@@ -41,7 +41,7 @@ jobs:
           cat <<EOF > version.json
           {
             "name": "DiscordNickSync ${{ github.ref_name }}",
-            "version": "${{ github.ref_name }}",
+            "version_number": "${{ github.ref_name }}",
             "project_id": "tles3bfw",
             "game_versions": ["1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4"],
             "loaders": ["spigot", "paper", "purpur"],
