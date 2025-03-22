@@ -118,17 +118,15 @@ public class DiscordNickSync extends JavaPlugin {
         String error = languageManager.getColor("error", true);
         String errorHighlight = languageManager.getColor("error_highlight", true);
         
-        String coloredWarning =
-            error + part1 +
-            errorHighlight + playerName +
-            error + part2 +
-            errorHighlight + variable +
-            error + part3;
-        String strippedWarning = part1 + playerName + part2 + variable + part3;
-        
-        getLogger().warning(strippedWarning);
+        getLogger().warning(part1 + playerName + part2 + variable + part3);
         if (notifySender != null) {
-            notifySender.sendMessage(coloredWarning);
+            notifySender.sendMessage(
+                error + part1 +
+                errorHighlight + playerName +
+                error + part2 +
+                errorHighlight + variable +
+                error + part3
+            );
         }
     }
 
