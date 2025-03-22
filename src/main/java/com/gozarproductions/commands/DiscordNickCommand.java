@@ -118,7 +118,7 @@ public class DiscordNickCommand implements CommandExecutor {
                 return true;
         }
         
-        player.sendMessage(languageManager.getMessage("messages.mode_set", "to", to, from, "Discord"));
+        player.sendMessage(languageManager.getMessage("messages.mode_set", "to", to, "from", from));
         plugin.syncPlayerWithMode(player, null, true);
 
         return true;
