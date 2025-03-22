@@ -211,7 +211,7 @@ public class DiscordNickSync extends JavaPlugin {
                                     " (Discord role hierarchy issue). Ensure the bot has permission and is above the user in the role list.");
                             } else {
                                 getLogger().warning("Failed to update Discord nickname for " + player.getName() +
-                                    ": " + failure.getMessage());
+                                    ": " + failure.getLocalizedMessage());
                             }
                         }
                     );
