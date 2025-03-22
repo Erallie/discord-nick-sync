@@ -83,3 +83,5 @@ errors:
         - Run `/discordnick sync` for all players or individual players.
         - Reload the config with `/discordnick reload`
     - Default: op
+# Support
+If you have any issues, or want to request a feature, please [create an issue](https://github.com/Erallie/discord-nick-sync/issues), and I will try my best to help!
