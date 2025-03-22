@@ -170,7 +170,6 @@ public class DiscordNickSync extends JavaPlugin {
 
         String discordNick = discordMember.getEffectiveName();
         String minecraftNick = ChatColor.stripColor(essentials.getUser(player).getNickname());
-        // getLogger().info("getNickname(): " + essentials.getUser(player).getNickname() + "\ngetNick(): " + essentials.getUser(player).getNick() + "\ngetNick(false): " + essentials.getUser(player).getNick(false) + "\ngetNick(false, false): " + essentials.getUser(player).getNick(false, false) + "\ngetNick(false, false, false): " + essentials.getUser(player).getNick(false, false, false) + "\ngetDisplayName(): " + player.getDisplayName() + "\ngetCustomNamek(): " + player.getCustomName() + "\ngetPlayerListName(): " + player.getPlayerListName() + "\ngetName(): " + player.getName());
         if (minecraftNick == null || minecraftNick.isEmpty()) {
             minecraftNick = player.getDisplayName();
         }
