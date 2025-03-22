@@ -192,7 +192,6 @@ public class DiscordNickSync extends JavaPlugin {
         String from;
         String to;
         String newNick;
-
         
         switch (syncMode) {
             case MINECRAFT:
