@@ -5,6 +5,7 @@ api-version: 1.21
 description: Syncs your Discord nickname with your Essentials nickname via DiscordSRV.
 author: Erika Gozar
 website: https://gozarproductions.com
+depend: [DiscordSRV, Essentials]
 commands:
   discordnick:
     description: Main command for DiscordNickSync.
