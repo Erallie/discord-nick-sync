@@ -158,7 +158,7 @@ public class DiscordNickSync extends JavaPlugin {
             return;
         }
 
-        Guild guild = jda.getGuilds().get(0);
+        Guild guild = discordSRV.getMainGuild();
 
         Member discordMember = guild.getMember(discordUser);
         if (discordMember == null) {
