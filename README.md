@@ -3,6 +3,15 @@ DiscordNickSync is a plugin that lets your players sync their Discord nickname t
 
 I know that DiscordSRV *already* allows syncing from Minecraft to Discord, but it doesn't allow syncing the other way around. So I created this plugin to do that!
 
+## When Nicknames are Synced
+DiscordNickSync currently *only* syncs nicknames when a player does any of the following:
+- Logs in
+- Links their Discord to Minecraft via DiscordSRV
+- Changes their Essentials nickname.
+- Uses the command `/discordnick sync`
+
+There is currently *no* timer to sync nicknames from Discord to Minecraft. If this is a feature you would want, [create an issue](https://github.com/Erallie/discord-nick-sync/issues), and I will consider adding it.
+
 # Default Files
 ## Config.yml
 ```yml
