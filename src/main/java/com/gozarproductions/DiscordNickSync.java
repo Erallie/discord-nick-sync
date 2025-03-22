@@ -213,7 +213,7 @@ public class DiscordNickSync extends JavaPlugin {
                             languageManager.getMessage("messages.sync_notif")
                         );
                     } catch (Exception e) {
-                        getLogger().warning("Failed to update nickname for " + player.getName() + e.getStackTrace());
+                        getLogger().warning("Failed to update nickname for " + player.getName() + e.getLocalizedMessage());
                     }
                 });
             } else {
