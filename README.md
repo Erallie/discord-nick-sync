@@ -14,7 +14,7 @@ internal:
 # What name to use by default for both Minecraft and Discord
 # This can be changed by the player as long as they have the permission discordnick.use
 # Can either be "minecraft", "discord", or "off"
-default-sync: discord
+default-sync: minecraft
 ```
 
 ## Language.yml
