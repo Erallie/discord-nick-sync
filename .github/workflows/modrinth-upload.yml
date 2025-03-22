@@ -5,29 +5,23 @@ on:
     types: [published]
 
 jobs:
-  build-and-upload:
-    name: Build plugin and upload to Modrinth
+  upload:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Install GitHub CLI
+        run: sudo apt-get install gh -y
 
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Build with Maven
-        run: mvn clean package
-
-      - name: Find built JAR file
-        id: findjar
+      - name: Download attached JAR asset
+        id: download
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          jar_file=$(find target -maxdepth 1 -name "*.jar" -not -name "*-sources.jar" -not -name "*-javadoc.jar" | head -n 1)
-          echo "JAR_PATH=$jar_file" >> $GITHUB_ENV
-          echo "Found JAR: $jar_file"
+          release_id=$(gh api repos/${{ github.repository }}/releases/tags/${{ github.ref_name }} --jq '.id')
+          jar_name=$(gh api repos/${{ github.repository }}/releases/$release_id/assets --jq '.[0].name')
+          echo "ASSET_NAME=$jar_name" >> $GITHUB_ENV
+          gh release download ${{ github.ref_name }} --pattern "*.jar"
+          echo "Downloaded: $jar_name"
 
       - name: Upload to Modrinth
         uses: RubixDev/modrinth-upload@v1
@@ -37,7 +31,7 @@ jobs:
           version: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
           changelog: ${{ github.event.release.body }}
-          file_path: ${{ env.JAR_PATH }}
+          file_path: ${{ env.ASSET_NAME }}
           game_versions: '["1.20", "1.21"]'
-          loaders: '["spigot", "paper", "purpur"]'
-          featured: true
+          loaders: '["spigot", "paper"]'
+          featured: false
