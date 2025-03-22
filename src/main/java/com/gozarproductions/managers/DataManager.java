@@ -48,7 +48,7 @@ public class DataManager {
                 }
             }
         } catch (IOException e) {
-            e.getLocalizedMessage();
+            plugin.getLogger().severe(e.getLocalizedMessage());
         }
     }
 
@@ -65,7 +65,7 @@ public class DataManager {
 
             gson.toJson(convertedData, writer);
         } catch (IOException e) {
-            e.getLocalizedMessage();
+            plugin.getLogger().severe(e.getLocalizedMessage());
         }
     }
 
