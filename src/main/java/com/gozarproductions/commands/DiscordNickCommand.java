@@ -31,7 +31,7 @@ public class DiscordNickCommand implements CommandExecutor {
         LanguageManager languageManager = plugin.getLanguageManager();
 
         if (subCommand.equals("reload")) {
-            if (!sender.hasPermission("discordsync.admin")) {
+            if (!sender.hasPermission("discordnick.admin")) {
                 sender.sendMessage(languageManager.getMessage("errors.no_permission"));
                 return true;
             }
@@ -54,7 +54,7 @@ public class DiscordNickCommand implements CommandExecutor {
             }
 
             // Handle "/discordnick sync all" or "/discordnick sync <player>"
-            if (!sender.hasPermission("discordsync.admin")) {
+            if (!sender.hasPermission("discordnick.admin")) {
                 sender.sendMessage(languageManager.getMessage("errors.no_permission"));
                 return true;
             }

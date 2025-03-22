@@ -17,14 +17,14 @@ commands:
     aliases: [dn, dnick, discnick]
     permission: discordnick.use
 permissions:
-  discordsync.use:
+  discordnick.use:
     description: Allows players to set their own nickname sync mode.
     default: true
-  discordsync.admin:
+  discordnick.admin:
     description: |
       §6Allows admins to:
       §e- Run §6/discordnick sync §efor all players
       §e- Reload the config
     default: op
     children:
-      discordsync.use: true
+      discordnick.use: true
