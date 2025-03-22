@@ -48,17 +48,20 @@ jobs:
             "featured": true,
             "changelog": "${{ github.event.release.body }}",
             "dependencies": [
-              {
+                {
                 "version": "*",
-                "project_id": "UmLGoGij"
-              },
-              {
+                "project_id": "UmLGoGij",
+                "dependency_type": "required"
+                },
+                {
                 "version": "*",
-                "project_id": "hXiIvTyT"
-              }
+                "project_id": "hXiIvTyT",
+                "dependency_type": "required"
+                }
             ]
           }
           EOF
+
 
       - name: Upload to Modrinth via API
         env:
