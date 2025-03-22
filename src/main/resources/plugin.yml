@@ -23,7 +23,7 @@ permissions:
   discordnick.admin:
     description: |
       §6Allows admins to:
-      §e- Run §6/discordnick sync §efor all players
+      §e- Run §6/discordnick sync §efor all players or individual players
       §e- Reload the config
     default: op
     children:
