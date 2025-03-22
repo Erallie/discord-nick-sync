@@ -1,0 +1,43 @@
+name: Publish to Modrinth
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-and-upload:
+    name: Build plugin and upload to Modrinth
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build with Maven
+        run: mvn clean package
+
+      - name: Find built JAR file
+        id: findjar
+        run: |
+          jar_file=$(find target -maxdepth 1 -name "*.jar" -not -name "*-sources.jar" -not -name "*-javadoc.jar" | head -n 1)
+          echo "JAR_PATH=$jar_file" >> $GITHUB_ENV
+          echo "Found JAR: $jar_file"
+
+      - name: Upload to Modrinth
+        uses: RubixDev/modrinth-upload@v1
+        with:
+          token: ${{ secrets.MODRINTH_TOKEN }}
+          project_id: tles3bfw
+          version: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          changelog: ${{ github.event.release.body }}
+          file_path: ${{ env.JAR_PATH }}
+          game_versions: '["1.20", "1.21"]'
+          loaders: '["spigot", "paper", "purpur"]'
+          featured: true
