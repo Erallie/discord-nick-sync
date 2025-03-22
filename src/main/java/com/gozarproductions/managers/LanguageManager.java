@@ -43,10 +43,10 @@ public class LanguageManager {
      */
     public String getColor(String key, boolean convertColors) {
         String color = languageConfig.getString("colors." + key, "");
-        if (!convertColors) {
-            return color;
+        if (convertColors) {
+            return ChatColor.translateAlternateColorCodes('&', color);
         }
-        return ChatColor.translateAlternateColorCodes('&', color);
+        return color;
     }
 
     /**
