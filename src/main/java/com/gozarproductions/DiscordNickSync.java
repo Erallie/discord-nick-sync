@@ -175,7 +175,20 @@ public class DiscordNickSync extends JavaPlugin {
         }
 
         if (discordNick.equals(minecraftNick)) {
-            getLogger().info("Did not sync nicknames for " + player.getName() + " because they already match.");
+            String part1 = "Did not sync nicknames for ";
+            String part2 = " because they already match.";
+            LanguageManager languageManager = getLanguageManager();
+            String defaultColor = languageManager.getColor("default", true);
+            String highlight = languageManager.getColor("highlight", true);
+            
+            getLogger().warning(part1 + minecraftNick + part2);
+            if (notifySender != null) {
+                notifySender.sendMessage(
+                    defaultColor + part1 +
+                    highlight + minecraftNick +
+                    defaultColor + part2
+                );
+            }
             return;
         }
         String from;
