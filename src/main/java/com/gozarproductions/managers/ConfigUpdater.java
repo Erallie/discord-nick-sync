@@ -68,7 +68,7 @@ public class ConfigUpdater {
                 currentConfig.save(file);
                 plugin.getLogger().info("Updated " + fileName + " with new settings.");
             } catch (IOException e) {
-                plugin.getLogger().warning("Could not update " + fileName + ": " + e.getMessage());
+                plugin.getLogger().severe("Could not update " + fileName + ": " + e.getLocalizedMessage());
             }
         }
     }
@@ -111,7 +111,7 @@ public class ConfigUpdater {
                 }
             }
         } catch (IOException e) {
-            plugin.getLogger().warning("Could not update data.json: " + e.getMessage());
+            plugin.getLogger().severe("Could not update data.json: " + e.getLocalizedMessage());
         }
     }
 }

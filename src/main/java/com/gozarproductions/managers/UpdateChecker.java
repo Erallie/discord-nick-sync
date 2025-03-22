@@ -46,7 +46,7 @@ public class UpdateChecker {
                     plugin.getLogger().info("Plugin is up to date.");
                 }
             } catch (Exception e) {
-                plugin.getLogger().warning(" Could not check for updates: " + e.getMessage());
+                plugin.getLogger().warning(" Could not check for updates: " + e.getLocalizedMessage());
             }
         });
     }
