@@ -2,6 +2,9 @@ name: DiscordNickSync
 version: 1.0
 main: com.gozarproductions.DiscordNickSync
 api-version: 1.21
+description: Syncs your Discord nickname with your Essentials nickname via DiscordSRV.
+author: Erika Gozar
+website: https://gozarproductions.com
 commands:
   discordnick:
     description: Main command for DiscordNickSync.
@@ -14,7 +17,7 @@ commands:
     permission: discordnick.use
 permissions:
   discordsync.use:
-    description: Allows players to set their own Discord nickname sync mode.
+    description: Allows players to set their own nickname sync mode.
     default: true
   discordsync.admin:
     description: |
@@ -22,3 +25,5 @@ permissions:
       §e- Run §6/discordnick §esync for all players
       §e- Reload the config
     default: op
+    children:
+      discordsync.use: true
