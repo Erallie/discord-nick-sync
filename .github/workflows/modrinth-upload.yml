@@ -58,9 +58,11 @@ jobs:
                 "project_id": "hXiIvTyT",
                 "dependency_type": "required"
                 }
-            ]
+            ],
+            "file_parts": ["$ASSET_NAME"]
           }
           EOF
+
 
 
       - name: Upload to Modrinth via API
