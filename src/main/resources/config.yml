@@ -1,5 +1,6 @@
 ## DO NOT CHANGE THIS
-plugin-verion: "1.0-SNAPSHOT"
+internal:
+  plugin-verion: "1.0-SNAPSHOT"
 ## DO NOT CHANGE THIS
 
 # Time in seconds to sync everyone's nicknames
