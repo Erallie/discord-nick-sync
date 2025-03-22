@@ -1,6 +1,5 @@
 package com.gozarproductions.commands;
 
-import github.scarsz.discordsrv.DiscordSRV;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -8,6 +7,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.gozarproductions.DiscordNickSync;
+import com.gozarproductions.managers.DataManager;
+import com.gozarproductions.managers.LanguageManager;
 import com.gozarproductions.utils.SyncMode;
 
 import java.util.UUID;
@@ -23,20 +24,20 @@ public class DiscordNickCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
-            //sender.sendMessage(plugin.getLanguageManager().getMessage("messages.usage"));
             return false;
         }
 
         String subCommand = args[0].toLowerCase();
+        LanguageManager languageManager = plugin.getLanguageManager();
 
         if (subCommand.equals("reload")) {
             if (!sender.hasPermission("discordsync.admin")) {
-                sender.sendMessage(plugin.getLanguageManager().getMessage("errors.no_permission"));
+                sender.sendMessage(languageManager.getMessage("errors.no_permission"));
                 return true;
             }
 
             plugin.reloadPluginConfig();
-            sender.sendMessage(plugin.getLanguageManager().getMessage("messages.reload_success"));
+            sender.sendMessage(languageManager.getMessage("messages.reload_success"));
             return true;
         }
 
@@ -45,159 +46,81 @@ public class DiscordNickCommand implements CommandExecutor {
             if (args.length == 1) {
                 // Regular players: sync their own nickname
                 if (!(sender instanceof Player)) {
-                    sender.sendMessage(plugin.getLanguageManager().getMessage("errors.only_players"));
+                    sender.sendMessage(languageManager.getMessage("errors.only_players"));
                     return true;
                 }
-                syncPlayer((Player) sender, sender);
+                plugin.syncPlayerWithMode((Player) sender, sender, false);
                 return true;
             }
 
             // Handle "/discordnick sync all" or "/discordnick sync <player>"
             if (!sender.hasPermission("discordsync.admin")) {
-                sender.sendMessage(plugin.getLanguageManager().getMessage("errors.no_permission"));
+                sender.sendMessage(languageManager.getMessage("errors.no_permission"));
                 return true;
             }
 
             if (args[1].equalsIgnoreCase("all")) {
-                syncAllPlayers(sender);
+                plugin.syncAllOnlinePlayers(sender);
                 return true;
             }
 
             // Try to find the specific player
             Player targetPlayer = Bukkit.getPlayerExact(args[1]);
             if (targetPlayer == null) {
-                sender.sendMessage(plugin.getLanguageManager().getMessage("errors.player_not_found", "player", args[1]));
+                sender.sendMessage(languageManager.getMessage("errors.player_not_found", "player", args[1]));
                 return true;
             }
 
-            syncPlayer(targetPlayer, sender);
+            plugin.syncPlayerWithMode(targetPlayer, sender, true);
             return true;
         }
 
         // Handle "/discordnick <discord|minecraft|off>"
         if (!(sender instanceof Player)) {
-            sender.sendMessage(plugin.getLanguageManager().getMessage("errors.only_players"));
+            sender.sendMessage(languageManager.getMessage("errors.only_players"));
             return true;
         }
 
         Player player = (Player) sender;
         UUID playerUUID = player.getUniqueId();
-        String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(playerUUID);
 
         String usage = command.getUsage()
-                    .replace("§e", plugin.getLanguageManager().getColor("default"))
-                    .replace("§6", plugin.getLanguageManager().getColor("highlight"));
+            .replace("§e", languageManager.getColor("default", true))
+            .replace("§6", languageManager.getColor("highlight", true));
 
         SyncMode mode = SyncMode.fromString(subCommand.toUpperCase());
 
         if (mode == null) {
-            player.sendMessage(plugin.getLanguageManager().getMessage("errors.invalid_command") + "\n" + usage);
+            player.sendMessage(languageManager.getMessage("errors.invalid_command") + "\n" + usage);
             return true;
         }
-        plugin.getDataManager().setSyncMode(playerUUID, mode.name());
-        plugin.getDataManager().saveData();
+        DataManager dataManager = plugin.getDataManager();
+        dataManager.setSyncMode(playerUUID, mode.name());
+        dataManager.saveData();
 
+        String to;
+        String from;
 
         switch (mode) {
             case MINECRAFT:
-                player.sendMessage(plugin.getLanguageManager().getMessage("messages.mode_set", "to", "Discord", "from", "Minecraft"));
-                plugin.syncMinecraftToDiscord(player, discordId);
+                to = "Discord";
+                from = "Minecraft";
                 break;
             case DISCORD:
-                player.sendMessage(plugin.getLanguageManager().getMessage("messages.mode_set", "to", "Minecraft", "from", "Discord"));
-                plugin.syncMinecraftToDiscord(player, discordId);
+                to = "Minecraft";
+                from = "Discord";
                 break;
             case OFF:
-                player.sendMessage(plugin.getLanguageManager().getMessage("messages.mode_off"));
-                break;
+                player.sendMessage(languageManager.getMessage("messages.mode_off"));
+                return true;
             default:
-                player.sendMessage(plugin.getLanguageManager().getMessage("errors.invalid_command") + "\n" + usage);
+                player.sendMessage(languageManager.getMessage("errors.invalid_command") + "\n" + usage);
                 return true;
         }
+        
+        player.sendMessage(languageManager.getMessage("messages.mode_set", "to", to, from, "Discord"));
+        plugin.syncPlayerWithMode(player, null, true);
 
         return true;
-    }
-
-    /**
-     * Syncs a specific player's nickname.
-     */
-    private void syncPlayer(Player player, CommandSender sender) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            UUID uuid = player.getUniqueId();
-            String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(uuid);
-
-            if (discordId == null) {
-                sender.sendMessage(plugin.getLanguageManager().getMessage("errors.sync_not_linked", "player", player.getName()));
-                return;
-            }
-
-            SyncMode syncMode = SyncMode.fromString(plugin.getDataManager().getSyncMode(uuid));
-
-            switch (syncMode) {
-                case MINECRAFT:
-                    plugin.syncMinecraftToDiscord(player, discordId);
-                    sender.sendMessage(
-                        plugin.getLanguageManager().getMessage(
-                                "messages.sync_success", 
-                                "player", player.getName(), 
-                                "from", "Minecraft", 
-                                "to", "Discord"
-                            )
-                        );
-                    break;
-                case DISCORD:
-                    plugin.syncDiscordToMinecraft(player, discordId);
-                    sender.sendMessage(
-                        plugin.getLanguageManager().getMessage(
-                                "messages.sync_success", 
-                                "player", player.getName(), 
-                                "from", "Discord", 
-                                "to", "Minecraft"
-                            )
-                        );
-                    break;
-                case OFF:
-                    sender.sendMessage(
-                        plugin.getLanguageManager().getMessage(
-                            "messages.sync_disabled", 
-                            "player", player.getName()
-                            )
-                        );
-                    break;
-            }
-        });
-    }
-
-    /**
-     * Syncs all online players' nicknames.
-     */
-    private void syncAllPlayers(CommandSender sender) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            int syncedCount = 0;
-
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                UUID uuid = player.getUniqueId();
-                String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(uuid);
-
-                if (discordId == null) continue; // Skip if not linked
-
-                SyncMode syncMode = SyncMode.fromString(plugin.getDataManager().getSyncMode(uuid));
-
-                switch (syncMode) {
-                    case MINECRAFT:
-                        plugin.syncMinecraftToDiscord(player, discordId);
-                        syncedCount++;
-                        break;
-                    case DISCORD:
-                        plugin.syncDiscordToMinecraft(player, discordId);
-                        syncedCount++;
-                        break;
-                    case OFF:
-                        break;
-                }
-            }
-
-            sender.sendMessage(plugin.getLanguageManager().getMessage("messages.sync_all_success", "count", String.valueOf(syncedCount)));
-        });
     }
 }

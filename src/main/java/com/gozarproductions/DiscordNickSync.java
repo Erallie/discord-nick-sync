@@ -1,12 +1,15 @@
 package com.gozarproductions;
 
 import github.scarsz.discordsrv.DiscordSRV;
+import github.scarsz.discordsrv.dependencies.jda.api.JDA;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Guild;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.User;
 import github.scarsz.discordsrv.dependencies.jda.api.exceptions.HierarchyException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -18,9 +21,9 @@ import com.gozarproductions.managers.ConfigUpdater;
 import com.gozarproductions.managers.DataManager;
 import com.gozarproductions.managers.LanguageManager;
 import com.gozarproductions.managers.UpdateChecker;
+import com.gozarproductions.utils.SyncMode;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.UUID;
 
 public class DiscordNickSync extends JavaPlugin {
 
@@ -87,140 +90,157 @@ public class DiscordNickSync extends JavaPlugin {
         getLogger().info("DiscordNickSync disabled!");
     }
 
-    /**
-     * Retrieves the prefix and suffix from the config.
-     */
-    private Map<String, String> getPrefixAndSuffix(Player player) {
-        Map<String, String> result = new HashMap<>();
+    public void syncAllOnlinePlayers(CommandSender sender) {
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+            int syncedCount = 0;
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                UUID uuid = player.getUniqueId();
+                String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(uuid);
+                if (discordId == null) continue;
 
-        if (essentials != null && essentials.getUser(player).getNickname() != null &&
-                !essentials.getUser(player).getNickname().isEmpty()) {
-            result.put("prefix", getConfig().getString("essentials-nick-prefix", ""));
-            result.put("suffix", getConfig().getString("essentials-nick-suffix", ""));
-        } else {
-            result.put("prefix", "");
-            result.put("suffix", "");
-            getLogger().info(player.getDisplayName() + " has no essentials nickname.");
-        }
-
-        return result;
-    }
-
-    /**
-     * Syncs the player's Minecraft nickname to Discord.
-     */
-    public void syncMinecraftToDiscord(Player player, String discordId) {
-        if (discordId == null) {
-            getLogger().warning("Could not sync Minecraft nickname to Discord for " + player.getDisplayName() + ": discordId is null");
-            return;
-        }
-
-        User discordUser = DiscordSRV.getPlugin().getJda().getUserById(discordId);
-        if (discordUser == null) {
-            getLogger().warning("Could not sync Minecraft nickname to Discord for " + player.getDisplayName() + ": discordUser is null");
-            return;
-        }
-
-        Member discordMember = DiscordSRV.getPlugin().getJda().getGuilds().get(0).getMember(discordUser);
-        if (discordMember == null) {
-            getLogger().warning("Could not sync Minecraft nickname to Discord for " + player.getDisplayName() + ": discordMember is null");
-            return;
-        }
-
-        String minecraftNickname = ChatColor.stripColor(player.getDisplayName());
-        String currentDiscordNick = discordMember.getEffectiveName();
-
-        Map<String, String> prefixAndSuffixData = getPrefixAndSuffix(player);
-        String prefix = prefixAndSuffixData.get("prefix");
-        String suffix = prefixAndSuffixData.get("suffix");
-
-        String formattedNick = prefix + currentDiscordNick + suffix;
-
-        // Only update if the nickname is different
-        if (!formattedNick.equals(minecraftNickname)) {
-            String newName = minecraftNickname.substring(prefix.length(), minecraftNickname.length() - suffix.length());
-            DiscordSRV.getPlugin().getJda().getGuilds().get(0)
-                .modifyNickname(discordMember, newName)
-                .queue(
-                    success -> {
-                        getLogger().info("Updated Discord nickname for " + player.getName() + " to " + newName);
-                        player.sendMessage(
-                            languageManager.getMessage(
-                                "messages.nickname_updated",
-                                "to", "Discord",
-                                "from", "Minecraft",
-                                "nickname", newName
-                            ) + "\n" +
-                            languageManager.getMessage("messages.sync_notif")
-                        );
-                    },
-                    failure -> {
-                        if (failure instanceof HierarchyException) {
-                            getLogger().warning("Cannot modify nickname for " + player.getName() + 
-                                " (Discord role hierarchy issue). Ensure the bot has permission and is above the user in the role list.");
-                        } else {
-                            getLogger().warning("Failed to update Discord nickname for " + player.getName() +
-                                ": " + failure.getMessage());
-                        }
-                    }
-                );
-        } else {
-            getLogger().info("Did not sync Minecraft nickname to Discord for " + player.getDisplayName() + " because they already match.");
-        }
-    }
-
-    /**
-     * Syncs the player's Discord nickname to Minecraft.
-     */
-    public void syncDiscordToMinecraft(Player player, String discordId) {
-        if (discordId == null) {
-            getLogger().warning("Could not sync Discord nickname to Minecraft for " + player.getDisplayName() + ": discordId is null");
-            return;
-        }
-
-        User discordUser = DiscordSRV.getPlugin().getJda().getUserById(discordId);
-        if (discordUser == null) {
-            getLogger().warning("Could not sync Discord nickname to Minecraft for " + player.getDisplayName() + ": discordUser is null");
-            return;
-        }
-
-        Member discordMember = DiscordSRV.getPlugin().getJda().getGuilds().get(0).getMember(discordUser);
-        if (discordMember == null) {
-            getLogger().warning("Could not sync Discord nickname to Minecraft for " + player.getDisplayName() + ": discordMember is null");
-            return;
-        }
-
-        String discordNickname = discordMember.getEffectiveName();
-        Map<String, String> prefixAndSuffixData = getPrefixAndSuffix(player);
-        String prefix = prefixAndSuffixData.get("prefix");
-        String suffix = prefixAndSuffixData.get("suffix");
-
-        String formattedNick = prefix + discordNickname + suffix;
-        String currentMcNick = ChatColor.stripColor(player.getDisplayName());
-
-        if (essentials != null) {
-            if (!currentMcNick.equals(formattedNick)) {
-                Bukkit.getScheduler().runTask(this, () -> {
-                    try {
-                        essentials.getUser(player).setNickname(discordNickname);
-                        player.sendMessage(
-                            languageManager.getMessage(
-                                "messages.nickname_updated",
-                                "to", "Minecraft",
-                                "from", "Discord",
-                                "nickname", formattedNick
-                            ) + "\n" +
-                            languageManager.getMessage("messages.sync_notif")
-                        );
-                    } catch (Exception e) {
-                        getLogger().warning("Failed to update nickname for " + player.getName() + e.getLocalizedMessage());
-                    }
-                });
-            } else {
-                getLogger().info("Did not sync Discord nickname to Minecraft for " + player.getDisplayName() + " because they already match.");
+                String mode = dataManager.getSyncMode(uuid);
+                syncPlayerWithMode(player, null, true);
+                
+                if (SyncMode.fromString(mode) != SyncMode.OFF){
+                    syncedCount++;
+                }
             }
-        } else {
-            getLogger().warning("Could not sync Discord nickname to Minecraft for " + player.getDisplayName() + ": essentials could not be found");
+            sender.sendMessage(languageManager.getMessage("messages.sync_all_success", "count", String.valueOf(syncedCount)));
+        });
+    }
+        
+    public void nullWarning(String variable, Player player, CommandSender notifySender) {
+        String part1 = "Could not sync nicknames for ";
+        String part2 = ": ";
+        String part3 = " is null";
+        String playerName = player.getName();
+        LanguageManager languageManager = getLanguageManager();
+        String error = languageManager.getColor("error", true);
+        String errorHighlight = languageManager.getColor("error_highlight", true);
+        
+        String coloredWarning =
+            error + part1 +
+            errorHighlight + playerName +
+            error + part2 +
+            errorHighlight + variable +
+            error + part3;
+        String strippedWarning = part1 + playerName + part2 + variable + part3;
+        
+        getLogger().warning(strippedWarning);
+        if (notifySender != null) {
+            notifySender.sendMessage(coloredWarning);
+        }
+    }
+
+    public void syncPlayerWithMode(Player player, CommandSender notifySender, boolean notifyOnSucceed) {
+        SyncMode syncMode = SyncMode.fromString(dataManager.getSyncMode(player.getUniqueId()));
+
+        if (syncMode == SyncMode.OFF) {    
+            if (notifySender != null) {
+                notifySender.sendMessage(languageManager.getMessage(
+                    "messages.sync_disabled",
+                    "player", player.getName()
+                ));
+            }
+            return;
+        }
+        
+        UUID uuid = player.getUniqueId();
+        DiscordSRV discordSRV = DiscordSRV.getPlugin();
+        JDA jda = discordSRV.getJda();
+        String discordId = discordSRV.getAccountLinkManager().getDiscordId(uuid);
+        if (discordId == null) {
+            nullWarning("discordId", player, notifySender);
+            return;
+        }
+
+        User discordUser = jda.getUserById(discordId);
+        if (discordUser == null) {
+            nullWarning("discordUser", player, notifySender);
+            return;
+        }
+
+        Guild guild = jda.getGuilds().get(0);
+
+        Member discordMember = guild.getMember(discordUser);
+        if (discordMember == null) {
+            nullWarning("discordMember", player, notifySender);
+            return;
+        }
+
+        String discordNick = discordMember.getEffectiveName();
+        String minecraftNick = ChatColor.stripColor(essentials.getUser(player).getNick(true, false, false));
+
+        if (discordNick.equals(minecraftNick)) {
+            getLogger().info("Did not sync nicknames for " + player.getName() + " because they already match.");
+            return;
+        }
+        String from;
+        String to;
+        String newNick;
+
+        
+        switch (syncMode) {
+            case MINECRAFT:
+                from = "Minecraft";
+                to = "Discord";
+                newNick = minecraftNick;
+                guild
+                    .modifyNickname(discordMember, newNick)
+                    .queue(
+                        success -> {
+                            getLogger().info("Updated Discord nickname for " + player.getName() + " to " + newNick);
+                        },
+                        failure -> {
+                            if (failure instanceof HierarchyException) {
+                                getLogger().warning("Cannot modify nickname for " + player.getName() + 
+                                    " (Discord role hierarchy issue). Ensure the bot has permission and is above the user in the role list.");
+                            } else {
+                                getLogger().warning("Failed to update Discord nickname for " + player.getName() +
+                                    ": " + failure.getMessage());
+                            }
+                        }
+                    );
+                break;
+            case DISCORD:
+                from = "Discord";
+                to = "Minecraft";
+                newNick = discordNick;
+                if (essentials != null) {
+                    Bukkit.getScheduler().runTask(this, () -> {
+                        try {
+                            essentials.getUser(player).setNickname(newNick);
+                        } catch (Exception e) {
+                            getLogger().warning("Failed to update nickname for " + player.getName() + e.getLocalizedMessage());
+                        }
+                    });
+                } else {
+                    getLogger().warning("Could not sync Discord nickname to Minecraft for " + player.getDisplayName() + ": essentials could not be found");
+                    return;
+                }
+                break;
+            default:
+                return;
+        }
+        if (notifySender == null || notifyOnSucceed) {
+            player.sendMessage(
+                languageManager.getMessage(
+                    "messages.nickname_updated",
+                    "to", to,
+                    "from", from,
+                    "nickname", newNick
+                ) + "\n" +
+                languageManager.getMessage("messages.sync_notif")
+            );
+        }
+        
+        if (notifySender != null) {
+            notifySender.sendMessage(languageManager.getMessage(
+                "messages.sync_success",
+                "player", newNick,
+                "from", from,
+                "to", to
+            ));
         }
     }
 

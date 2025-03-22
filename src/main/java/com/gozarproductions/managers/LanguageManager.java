@@ -41,8 +41,11 @@ public class LanguageManager {
     /**
      * Retrieves a color from the language config.
      */
-    public String getColor(String key) {
+    public String getColor(String key, boolean convertColors) {
         String color = languageConfig.getString("colors." + key, "");
+        if (!convertColors) {
+            return color;
+        }
         return ChatColor.translateAlternateColorCodes('&', color);
     }
 
@@ -54,10 +57,10 @@ public class LanguageManager {
 
         // Apply color codes
         message = message
-            .replace("{d}", getColor("default"))
-            .replace("{h}", getColor("highlight"))
-            .replace("{e}", getColor("error"))
-            .replace("{eh}", getColor("error_highlight"));
+            .replace("{d}", getColor("default", false))
+            .replace("{h}", getColor("highlight", false))
+            .replace("{e}", getColor("error", false))
+            .replace("{eh}", getColor("error_highlight", false));
 
         // Apply placeholders
         for (int i = 0; i < replacements.length; i += 2) {
