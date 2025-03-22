@@ -1,4 +1,4 @@
-name: Publish to Modrinth
+name: Upload to Modrinth
 
 on:
   release:
@@ -17,7 +17,7 @@ jobs:
           echo "Fetching release info..."
           api_url="https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ github.ref_name }}"
           asset_info=$(curl -s -H "Authorization: token $GH_TOKEN" $api_url)
-          jar_name=$(echo "$asset_info" | jq -r '.assets[] | select(.name | test("^discordnicksync-.*\\.jar$")) | .name' | head -n 1)
+          jar_name=$(echo "$asset_info" | jq -r '.assets[] | select(.name | endswith(".jar")) | .name' | head -n 1)
 
           if [ -z "$jar_name" ]; then
             echo "No .jar asset found in release!"
@@ -31,21 +31,41 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Downloading asset: $ASSET_NAME"
-          download_url="https://api.github.com/repos/${{ github.repository }}/releases/assets"
           asset_id=$(curl -s -H "Authorization: token $GH_TOKEN" https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ github.ref_name }} | jq '.assets[] | select(.name=="'"$ASSET_NAME"'") | .id')
           curl -L -H "Authorization: token $GH_TOKEN" -H "Accept: application/octet-stream" \
             "https://api.github.com/repos/${{ github.repository }}/releases/assets/$asset_id" \
             -o "$ASSET_NAME"
 
-      - name: Upload to Modrinth
-        uses: RubixDev/modrinth-upload@v1
-        with:
-          token: ${{ secrets.MODRINTH_TOKEN }}
-          project_id: tles3bfw
-          version: ${{ github.ref_name }}
-          name: DiscordNickSync ${{ github.ref_name }}
-          changelog: ${{ github.event.release.body }}
-          file_path: ${{ env.ASSET_NAME }}
-          game_versions: '1.21.4'
-          loaders: 'purpur'
-          featured: true
+      - name: Prepare Modrinth metadata
+        run: |
+          cat <<EOF > version.json
+          {
+            "name": "DiscordNickSync ${{ github.ref_name }}",
+            "version": "${{ github.ref_name }}",
+            "project_id": "tles3bfw",
+            "game_versions": "1.21,1.21.1,1.21.2,1.21.3,1.21.4",
+            "loaders": "purpur,paper,spigot",
+            "featured": true,
+            "changelog": "${{ github.event.release.body }}",
+            "dependencies": [
+              {
+                "version": "*",
+                "project_id": "UmLGoGij"
+              },
+              {
+                "version": "*",
+                "project_id": "hXiIvTyT"
+              }
+            ]
+          }
+          EOF
+
+      - name: Upload to Modrinth via API
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          curl -X POST https://api.modrinth.com/v2/version \
+            -H "Authorization: $MODRINTH_TOKEN" \
+            -H "Content-Type: multipart/form-data" \
+            -F "data=@version.json;type=application/json" \
+            -F "file=@$ASSET_NAME;type=application/java-archive"
