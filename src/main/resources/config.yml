@@ -4,12 +4,12 @@ plugin-verion: "1.0-SNAPSHOT"
 
 # Time in seconds to sync everyone's nicknames
 #sync-interval: 60  
-# Your essentials prefix.
+# Your essentials prefix, WITHOUT the color
 # Will be removed from the beginning of your Minecraft nickname before syncing to Discord.
 essentials-nick-prefix: "*"
-# Your essentials suffix.
+# Your essentials suffix, WITHOUT the color
 # Will be removed from the end of your Minecraft nickname before syncing to Discord.
-essentials-nick-suffix: "§r"
+essentials-nick-suffix: ""
 # What name to use by default for both Minecraft and Discord
 # This can be changed by the player as long as they have the permission discordnick.use
 # Can either be "minecraft", "discord", or "off"

@@ -6,6 +6,7 @@ import github.scarsz.discordsrv.dependencies.jda.api.entities.User;
 import github.scarsz.discordsrv.dependencies.jda.api.exceptions.HierarchyException;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -126,7 +127,7 @@ public class DiscordNickSync extends JavaPlugin {
             return;
         }
 
-        String minecraftNickname = player.getDisplayName();
+        String minecraftNickname = ChatColor.stripColor(player.getDisplayName());
         String currentDiscordNick = discordMember.getEffectiveName();
 
         Map<String, String> prefixAndSuffixData = getPrefixAndSuffix(player);
@@ -195,7 +196,7 @@ public class DiscordNickSync extends JavaPlugin {
         String suffix = prefixAndSuffixData.get("suffix");
 
         String formattedNick = prefix + discordNickname + suffix;
-        String currentMcNick = player.getDisplayName();
+        String currentMcNick = ChatColor.stripColor(player.getDisplayName());
 
         if (essentials != null) {
             if (!currentMcNick.equals(formattedNick)) {
