@@ -45,7 +45,7 @@ public class ConfigUpdater {
             InputStream defaultStream = plugin.getResource(fileName);
             if (defaultStream == null) return;
 
-            // Read the entire default config as text
+            // Step 1: Load entire default config as text
             StringBuilder defaultText = new StringBuilder();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(defaultStream))) {
                 String line;
@@ -54,43 +54,29 @@ public class ConfigUpdater {
                 }
             }
 
-            // Replace any values in the default text with the user's values
-            String mergedText = defaultText.toString();
-            for (String key : userConfig.getKeys(true)) {
-                Object userValue = userConfig.get(key);
-                if (userValue == null) continue;
-                String userFormatted = formatYamlValue(userValue);
-
-                // Escape regex characters in the key pattern
-                String regexKeyPattern = "(?m)^([ \t]*)" + key.replace(".", "[ \\t]*\\n?\\1") + ": .*?$";
-                String replacement = "$1" + key.substring(key.lastIndexOf('.') + 1) + ": " + userFormatted;
-
-                // Try replacing the value in-place
-                mergedText = mergedText.replaceAll(regexKeyPattern, replacement);
-            }
-
+            // Step 2: Write the raw default file to disk
             try (FileWriter writer = new FileWriter(file)) {
-                writer.write(mergedText);
+                writer.write(defaultText.toString());
             }
 
-            plugin.getLogger().info("Updated " + fileName + " with user values merged into the latest default.");
+            // Step 3: Reload written default config
+            FileConfiguration newConfig = YamlConfiguration.loadConfiguration(file);
+
+            // Step 4: Set all user-defined keys back into the config
+            for (String key : userConfig.getKeys(true)) {
+                Object value = userConfig.get(key);
+                if (value != null) {
+                    newConfig.set(key, value);
+                }
+            }
+
+            // Step 5: Save final config with merged values
+            newConfig.save(file);
+            plugin.getLogger().info("Updated " + fileName + " by restoring user values into the new default config.");
 
         } catch (IOException e) {
             plugin.getLogger().severe("Could not update " + fileName + ": " + e.getLocalizedMessage());
         }
-    }
-
-    private String formatYamlValue(Object value) {
-        if (value instanceof String) return "\"" + value + "\"";
-        if (value instanceof Boolean || value instanceof Number) return value.toString();
-        if (value instanceof java.util.List) {
-            StringBuilder sb = new StringBuilder("\n");
-            for (Object item : (java.util.List<?>) value) {
-                sb.append("  - ").append(item).append("\n");
-            }
-            return sb.toString();
-        }
-        return String.valueOf(value);
     }
 
     private void updateJsonFile() {
