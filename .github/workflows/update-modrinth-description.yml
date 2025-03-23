@@ -16,17 +16,15 @@ jobs:
       - name: Read README.md
         id: readme
         run: |
-          DESCRIPTION=$(<README.md)
-          DESCRIPTION="${DESCRIPTION//'%'/'%25'}"
-          DESCRIPTION="${DESCRIPTION//$'\n'/'%0A'}"
-          DESCRIPTION="${DESCRIPTION//$'\r'/'%0D'}"
-          echo "content=$DESCRIPTION" >> "$GITHUB_OUTPUT"
+          echo "content<<EOF" >> $GITHUB_OUTPUT
+          cat README.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Update Modrinth project description
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
         run: |
-          curl -X PATCH https://api.modrinth.com/v2/project/tles3bfw \
-            -H "Authorization: $MODRINTH_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d "{\"body\": \"${{ steps.readme.outputs.content }}\"}"
+          curl -X PATCH https://api.modrinth.com/v2/project/zE5EbgF4 \
+          -H "Authorization: $MODRINTH_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d "$(jq -n --arg body "${{ steps.readme.outputs.content }}" '{ body: $body }')"
