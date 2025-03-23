@@ -12,6 +12,7 @@ public enum SyncMode {
      * Converts a string to a SyncMode, defaulting to DISCORD if invalid.
      */
     public static SyncMode fromString(String mode) {
+        if (mode == null) return null;
         try {
             return SyncMode.valueOf(mode.toUpperCase()); // Convert input to uppercase before matching
         } catch (IllegalArgumentException e) {
