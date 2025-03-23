@@ -42,8 +42,11 @@ public class UpdateChecker {
                 if (isLatestVersion(currentVersion, latestVersion)) {
                     plugin.getLogger().info("Plugin is up to date.");
                 } else {
-                    plugin.getLogger().warning("A new version is available: " + latestVersion);
-                    notifyAdmins(latestVersion, downloadUrl);
+                    plugin.getLogger().warning(
+                        "A new version is available: " + latestVersion +
+                        "\n(Current version: " + currentVersion +
+                        ")\n Download: " + downloadUrl);
+                    notifyAdmins(latestVersion, currentVersion, downloadUrl);
                 }
 
             } catch (Exception e) {
@@ -71,15 +74,17 @@ public class UpdateChecker {
     /**
      * Notifies all admins about the new update.
      */
-    public void notifyAdmins(String latestVersion, String downloadUrl) {
+    private void notifyAdmins(String latestVersion, String currentVersion, String downloadUrl) {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.hasPermission("discordnick.admin")) {
                 LanguageManager languageManager = plugin.getLanguageManager();
                 String defaultColor = languageManager.getColor("default", true);
                 String highlight = languageManager.getColor("highlight", true);
                 
-                player.sendMessage(highlight + "[DiscordNickSync] " + defaultColor + "A new update is available: " + highlight + latestVersion);
-                player.sendMessage(defaultColor + "Download: " + highlight + downloadUrl);
+                player.sendMessage(
+                    highlight + "[" + ChatColor.BOLD + "DiscordNickSync" + highlight + "] " + defaultColor + "A new update is available: " + highlight + latestVersion +
+                    "\n" + defaultColor + "(Current version: " + highlight + currentVersion + defaultColor + ")" + 
+                    "\n" + defaultColor + "Download: " + highlight + downloadUrl);
             }
         }
     }
