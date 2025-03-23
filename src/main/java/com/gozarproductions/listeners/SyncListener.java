@@ -28,7 +28,7 @@ public class SyncListener extends ListenerAdapter implements Listener {
         // Check if the player is an admin
         if (player.hasPermission("discordnick.admin")) {
             // Check if an update is available
-            plugin.getUpdateChecker().recallAndNotify();
+            plugin.getUpdateChecker().recallAndNotify(player);
         }
         plugin.syncPlayerWithMode(player, null, true);
     }
