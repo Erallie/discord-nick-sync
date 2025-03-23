@@ -42,31 +42,6 @@ public class ConfigUpdater {
         }
     }
 
-    private void writeSection(StringBuilder yaml, ConfigurationSection section, int indent, String pathPrefix, FileConfiguration userConfig, Map<String, String> commentMap) {
-        for (String key : section.getKeys(false)) {
-            Object value = section.get(key);
-            String fullPath = pathPrefix.isEmpty() ? key : pathPrefix + "." + key;
-
-            // Build indent
-            StringBuilder indentBuilder = new StringBuilder();
-            for (int i = 0; i < indent; i++) indentBuilder.append(" ");
-            String indentStr = indentBuilder.toString();
-
-            // Insert comment before key (if exists)
-            if (commentMap.containsKey(fullPath)) {
-                yaml.append(commentMap.get(fullPath));
-            }
-
-            if (value instanceof ConfigurationSection) {
-                yaml.append(indentStr).append(key).append(":\n");
-                writeSection(yaml, (ConfigurationSection) value, indent + 2, fullPath, userConfig, commentMap);
-            } else {
-                Object val = userConfig.contains(fullPath) ? userConfig.get(fullPath) : value;
-                yaml.append(indentStr).append(key).append(": ").append(formatYamlValue(val, indent)).append("\n");
-            }
-        }
-    }
-
     /**
      * Updates a YAML file by adding missing keys without overwriting existing values.
      */
@@ -123,6 +98,31 @@ public class ConfigUpdater {
             plugin.getLogger().info("Updated " + fileName + ".");
         } catch (IOException e) {
             plugin.getLogger().severe("Could not update " + fileName + ": " + e.getLocalizedMessage());
+        }
+    }
+    
+    private void writeSection(StringBuilder yaml, ConfigurationSection section, int indent, String pathPrefix, FileConfiguration userConfig, Map<String, String> commentMap) {
+        for (String key : section.getKeys(false)) {
+            Object value = section.get(key);
+            String fullPath = pathPrefix.isEmpty() ? key : pathPrefix + "." + key;
+
+            // Build indent
+            StringBuilder indentBuilder = new StringBuilder();
+            for (int i = 0; i < indent; i++) indentBuilder.append(" ");
+            String indentStr = indentBuilder.toString();
+
+            // Insert comment before key (if exists)
+            if (commentMap.containsKey(fullPath)) {
+                yaml.append(commentMap.get(fullPath));
+            }
+
+            if (value instanceof ConfigurationSection) {
+                yaml.append(indentStr).append(key).append(":\n");
+                writeSection(yaml, (ConfigurationSection) value, indent + 2, fullPath, userConfig, commentMap);
+            } else {
+                Object val = userConfig.contains(fullPath) ? userConfig.get(fullPath) : value;
+                yaml.append(indentStr).append(key).append(": ").append(formatYamlValue(val, indent)).append("\n");
+            }
         }
     }
 
