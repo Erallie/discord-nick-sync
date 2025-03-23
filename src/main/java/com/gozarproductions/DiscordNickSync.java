@@ -5,6 +5,7 @@ import github.scarsz.discordsrv.dependencies.jda.api.JDA;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Guild;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.User;
+import github.scarsz.discordsrv.dependencies.jda.api.exceptions.HierarchyException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -221,6 +222,15 @@ public class DiscordNickSync extends JavaPlugin {
                                 getLogger().info("Updated Discord nickname for " + playerName + " to " + newNick);
                             }
                         );
+                } catch (HierarchyException e) {
+                    getLogger().warning("Cannot modify nickname for " + playerName + 
+                        "  (Discord role hierarchy issue): ensure the bot has permission and is above the user in the role list.");
+                    if (notifySender != null) {
+                        if (notifySender != null); {
+                            notifySender.sendMessage(error + "Cannot modify nickname for " + errorHighlight + playerName + error + "  (Discord role hierarchy issue): ensure the bot has permission and is above the user in the role list.");
+                        }
+                    }
+                    return;
                 } catch (Exception e) {
                     String localizedError = e.getLocalizedMessage();
                     getLogger().warning("Cannot modify nickname for " + playerName + 
