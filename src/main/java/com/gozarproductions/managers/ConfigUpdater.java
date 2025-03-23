@@ -55,7 +55,7 @@ public class ConfigUpdater {
             if (defaultStream == null) return;
             FileConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(plugin.getResource(fileName)));
 
-            // Step 1: Parse default config file to collect comments per full key
+            //#region Parse default config file to collect comments per full key
             Map<String, String> commentMap = new LinkedHashMap<>();
             Map<Integer, String> indentPath = new HashMap<>();
             StringBuilder commentBuffer = new StringBuilder();
@@ -87,13 +87,14 @@ public class ConfigUpdater {
                     commentBuffer.setLength(0);
                 }
             }
-
-            // Step 2: Rebuild YAML with preserved comments and values
+            //#endregion
+            //#region Rebuild YAML with preserved comments and values
             StringBuilder output = new StringBuilder();
             writeSection(output, defaultConfig, 0, "", userConfig, commentMap);
             try (FileWriter writer = new FileWriter(file)) {
                 writer.write(output.toString());
             }
+            //#endregion
 
             plugin.getLogger().info("Updated " + fileName + ".");
         } catch (IOException e) {
