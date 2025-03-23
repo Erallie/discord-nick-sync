@@ -3,7 +3,7 @@ name: Update Modrinth Description
 on:
   push:
     branches:
-      - main  # Change this if your default branch is different
+      - main  # Change to your default branch if needed
 
 jobs:
   update-description:
@@ -13,18 +13,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Read README.md
-        id: readme
+      - name: Read README.md into environment variable
         run: |
-          echo "content<<EOF" >> $GITHUB_OUTPUT
-          cat README.md >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          echo "README_CONTENT<<EOF" >> $GITHUB_ENV
+          cat README.md >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: Update Modrinth project description
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          README_CONTENT: ${{ env.README_CONTENT }}
         run: |
           curl -X PATCH https://api.modrinth.com/v2/project/zE5EbgF4 \
-          -H "Authorization: $MODRINTH_TOKEN" \
-          -H "Content-Type: application/json" \
-          -d "$(jq -n --arg body "${{ steps.readme.outputs.content }}" '{ body: $body }')"
+            -H "Authorization: $MODRINTH_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n --arg body "$README_CONTENT" '{ body: $body }')"
