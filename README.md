@@ -17,15 +17,28 @@ There is currently *no* timer to sync nicknames from Discord to Minecraft. If th
 # Default Files
 ## Config.yml
 ```yml
-## DO NOT CHANGE THIS
+# DO NOT CHANGE THIS
 internal:
-  plugin-version: "X.X.X"
-## DO NOT CHANGE THIS
+  plugin-version: "x.x.x"
+# DO NOT CHANGE THIS
 
-# What name to use by default for both Minecraft and Discord
+# What name to use by default for both Minecraft and Discord.
 # This can be changed by the player as long as they have the permission discordnick.use
 # Can either be "minecraft", "discord", or "off"
 default-sync: minecraft
+
+# What to replace whitespace characters with when syncing from Discord to Minecraft.
+# Keep this as "" to remove whitespace characters.
+# Set this to " " to keep as spaces.
+# Set this to anything else to replace it with that.
+replace-whitespaces-with: ""
+
+# Whether to combine whitespace characters together before replacing them with the value above.
+merge-whitespaces-before-replacing: true
+
+updater:
+  # Whether to notify admins for new snapshot releases. Admins will still be notified on stable releases.
+  notify-on-dev-release: false
 ```
 
 ## Language.yml
