@@ -27,7 +27,7 @@ public class SyncListener extends ListenerAdapter implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         // Check if the player is an admin
-        if (player.hasPermission("discordsync.admin")) {
+        if (player.hasPermission("discordnick.admin")) {
             // Check if an update is available
             UpdateChecker updateChecker = plugin.getUpdateChecker();
             String latestVersion = updateChecker.latestVersion;

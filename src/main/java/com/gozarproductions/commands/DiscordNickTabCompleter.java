@@ -21,14 +21,14 @@ public class DiscordNickTabCompleter implements TabCompleter {
             completions.add("minecraft");
             completions.add("off");
             completions.add("sync");
-            if (sender.hasPermission("discordsync.admin")) {
+            if (sender.hasPermission("discordnick.admin")) {
                 completions.add("reload");
             }
         }
 
         // Second argument suggestions for "/discordnick sync ..."
         if (args.length == 2 && args[0].equalsIgnoreCase("sync")) {
-            if (sender.hasPermission("discordsync.admin")) {
+            if (sender.hasPermission("discordnick.admin")) {
                 completions.add("all"); // Admins can sync all
                 completions.addAll(Bukkit.getOnlinePlayers().stream()
                         .map(Player::getName)

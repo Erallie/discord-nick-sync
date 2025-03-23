@@ -71,7 +71,7 @@ public class UpdateChecker {
      */
     public void notifyAdmins(String latestVersion, String downloadUrl) {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.hasPermission("discordsync.admin")) {
+            if (player.hasPermission("discordnick.admin")) {
                 LanguageManager languageManager = plugin.getLanguageManager();
                 String defaultColor = languageManager.getColor("default", true);
                 String highlight = languageManager.getColor("highlight", true);
