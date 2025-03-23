@@ -17,7 +17,7 @@ jobs:
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
         run: |
-          jq -Rs --argjson endpoint '{"body": .}' . < README.md > body.json
+          jq -Rs --arg body "$(cat README.md)" '{ body: $body }' > body.json
 
           curl -X PATCH https://api.modrinth.com/v2/project/zE5EbgF4 \
             -H "Authorization: $MODRINTH_TOKEN" \
