@@ -19,7 +19,7 @@ There is currently *no* timer to sync nicknames from Discord to Minecraft. If th
 ```yml
 # DO NOT CHANGE THIS
 internal:
-  plugin-version: "x.x.x"
+  plugin-version: "X.X.X"
 # DO NOT CHANGE THIS
 
 # What name to use by default for both Minecraft and Discord.
