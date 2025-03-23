@@ -55,55 +55,72 @@ public class ConfigUpdater {
             if (defaultStream == null) return;
             FileConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(plugin.getResource(fileName)));
 
-            //#region Parse default config file to collect comments per full key
-            Map<String, String> commentMap = new LinkedHashMap<>();
+            // Parse default config file to collect before/after comments
+            Map<String, String> commentsBefore = new LinkedHashMap<>();
+            Map<String, String> commentsAfter = new LinkedHashMap<>();
             Map<Integer, String> indentPath = new HashMap<>();
             StringBuilder commentBuffer = new StringBuilder();
+
+            String lastKey = null;
+            boolean blankSinceLastKey = false;
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(defaultStream));
             String line;
             while ((line = reader.readLine()) != null) {
                 String trimmed = line.trim();
-                if (trimmed.isEmpty() || trimmed.startsWith("#")) {
+
+                if (trimmed.isEmpty()) {
+                    commentBuffer.append("\n");
+                    blankSinceLastKey = true;
+                    continue;
+                }
+
+                if (trimmed.startsWith("#")) {
                     commentBuffer.append(line).append("\n");
                     continue;
                 }
 
-                int indent = line.indexOf(trimmed); // number of leading spaces
+                int indent = line.indexOf(trimmed);
                 String key = trimmed.split(":")[0].trim();
                 indentPath.put(indent, key);
 
-                // Build full path from indentPath
-                StringBuilder fullPath = new StringBuilder();
+                StringBuilder fullPathBuilder = new StringBuilder();
                 for (int i = 0; i <= indent; i++) {
                     if (indentPath.containsKey(i)) {
-                        if (fullPath.length() > 0) fullPath.append(".");
-                        fullPath.append(indentPath.get(i));
+                        if (fullPathBuilder.length() > 0) fullPathBuilder.append(".");
+                        fullPathBuilder.append(indentPath.get(i));
                     }
                 }
+                String fullPath = fullPathBuilder.toString();
 
                 if (commentBuffer.length() > 0) {
-                    commentMap.put(fullPath.toString(), commentBuffer.toString());
+                    if (!blankSinceLastKey && lastKey != null) {
+                        commentsAfter.put(lastKey, commentBuffer.toString());
+                    } else {
+                        commentsBefore.put(fullPath, commentBuffer.toString());
+                    }
                     commentBuffer.setLength(0);
                 }
+
+                lastKey = fullPath;
+                blankSinceLastKey = false;
             }
-            //#endregion
-            
-            //#region Rebuild YAML with preserved comments and values
+
+            // Rebuild YAML
             StringBuilder output = new StringBuilder();
-            writeSection(output, defaultConfig, 0, "", userConfig, commentMap);
+            writeSection(output, defaultConfig, 0, "", userConfig, commentsBefore, commentsAfter);
+
             try (FileWriter writer = new FileWriter(file)) {
                 writer.write(output.toString());
             }
-            //#endregion
 
             plugin.getLogger().info("Updated " + fileName + ".");
         } catch (IOException e) {
             plugin.getLogger().severe("Could not update " + fileName + ": " + e.getLocalizedMessage());
         }
     }
-    
-    private void writeSection(StringBuilder yaml, ConfigurationSection section, int indent, String pathPrefix, FileConfiguration userConfig, Map<String, String> commentMap) {
+
+    private void writeSection(StringBuilder yaml, ConfigurationSection section, int indent, String pathPrefix, FileConfiguration userConfig, Map<String, String> commentsBefore, Map<String, String> commentsAfter) {
         for (String key : section.getKeys(false)) {
             Object value = section.get(key);
             String fullPath = pathPrefix.isEmpty() ? key : pathPrefix + "." + key;
@@ -113,17 +130,22 @@ public class ConfigUpdater {
             for (int i = 0; i < indent; i++) indentBuilder.append(" ");
             String indentStr = indentBuilder.toString();
 
-            // Insert comment before key (if exists)
-            if (commentMap.containsKey(fullPath)) {
-                yaml.append(commentMap.get(fullPath));
+            if (commentsBefore.containsKey(fullPath)) {
+                yaml.append(commentsBefore.get(fullPath));
             }
 
+            yaml.append(indentStr).append(key).append(": ");
+
             if (value instanceof ConfigurationSection) {
-                yaml.append(indentStr).append(key).append(":\n");
-                writeSection(yaml, (ConfigurationSection) value, indent + 2, fullPath, userConfig, commentMap);
+                yaml.append("\n");
+                writeSection(yaml, (ConfigurationSection) value, indent + 2, fullPath, userConfig, commentsBefore, commentsAfter);
             } else {
                 Object val = userConfig.contains(fullPath) ? userConfig.get(fullPath) : value;
-                yaml.append(indentStr).append(key).append(": ").append(formatYamlValue(val, indent)).append("\n");
+                yaml.append(formatYamlValue(val, indent)).append("\n");
+            }
+
+            if (commentsAfter.containsKey(fullPath)) {
+                yaml.append(commentsAfter.get(fullPath));
             }
         }
     }
@@ -158,14 +180,11 @@ public class ConfigUpdater {
             Gson gson = new Gson();
             JsonObject currentData = JsonParser.parseReader(reader).getAsJsonObject();
 
-            // Load default file from JAR (if available)
             InputStream defaultStream = plugin.getResource("data.json");
             if (defaultStream != null) {
                 JsonObject defaultData = JsonParser.parseReader(new InputStreamReader(defaultStream)).getAsJsonObject();
 
                 boolean updated = false;
-
-                // Add missing keys from the default file
                 for (String key : defaultData.keySet()) {
                     if (!currentData.has(key)) {
                         currentData.add(key, defaultData.get(key));
