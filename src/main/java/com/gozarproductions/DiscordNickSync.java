@@ -10,6 +10,7 @@ import github.scarsz.discordsrv.dependencies.jda.api.exceptions.HierarchyExcepti
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -166,7 +167,18 @@ public class DiscordNickSync extends JavaPlugin {
             return;
         }
 
-        String discordNick = discordMember.getEffectiveName();
+        String discordNickOrig = discordMember.getEffectiveName();
+        FileConfiguration config = getConfig();
+        String replaceWith = config.getString("replace-whitespaces-with");
+        boolean merge = config.getBoolean("merge-whitespaces-before-replacing");
+        String discordNick;
+        if (merge) {
+            discordNick = discordNickOrig.replaceAll("\\s+", replaceWith);
+        }
+        else {
+            discordNick = discordNickOrig.replaceAll("\\s", replaceWith);
+        }
+
         String minecraftNick = ChatColor.stripColor(essentials.getUser(player).getNickname());
         if (minecraftNick == null || minecraftNick.isEmpty()) {
             minecraftNick = player.getDisplayName();

@@ -3,7 +3,16 @@ internal:
   plugin-version: "1.0.0"
 ## DO NOT CHANGE THIS
 
-# What name to use by default for both Minecraft and Discord
+# What name to use by default for both Minecraft and Discord.
 # This can be changed by the player as long as they have the permission discordnick.use
 # Can either be "minecraft", "discord", or "off"
 default-sync: minecraft
+
+# What to replace whitespace characters with when syncing from Discord to Minecraft.
+# Keep this as "" to remove whitespace characters.
+# Set this to " " to keep as spaces.
+# Set this to anything else to replace it with that.
+replace-whitespaces-with: ""
+
+# Whether to combine whitespace characters together before replacing them with the value above.
+merge-whitespaces-before-replacing: true
