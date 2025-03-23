@@ -39,16 +39,31 @@ public class UpdateChecker {
                 String currentVersion = plugin.getDescription().getVersion();
 
                 // Compare versions
-                if (!currentVersion.equalsIgnoreCase(latestVersion)) {
+                if (isLatestVersion(currentVersion, latestVersion)) {
+                    plugin.getLogger().info("Plugin is up to date.");
+                } else {
                     plugin.getLogger().warning("A new version is available: " + latestVersion);
                     notifyAdmins(latestVersion, downloadUrl);
-                } else {
-                    plugin.getLogger().info("Plugin is up to date.");
                 }
+
             } catch (Exception e) {
-                plugin.getLogger().warning(" Could not check for updates: " + e.getLocalizedMessage());
+                plugin.getLogger().warning("Could not check for updates: " + e.getLocalizedMessage());
             }
         });
+    }
+
+    private boolean isLatestVersion(String current, String latest) {
+        String[] currentParts = current.split("\\.");
+        String[] latestParts = latest.split("\\.");
+
+        int length = Math.max(currentParts.length, latestParts.length);
+        for (int i = 0; i < length; i++) {
+            int curr = i < currentParts.length ? Integer.parseInt(currentParts[i]) : 0;
+            int lat = i < latestParts.length ? Integer.parseInt(latestParts[i]) : 0;
+            if (curr < lat) return false;
+            if (curr > lat) return true;
+        }
+        return true; // Versions are equal
     }
 
     /**
