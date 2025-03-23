@@ -95,7 +95,7 @@ public class DiscordNickCommand implements CommandExecutor {
             return true;
         }
         DataManager dataManager = plugin.getDataManager();
-        dataManager.setSyncMode(playerUUID, mode.name());
+        dataManager.setSyncMode(playerUUID, mode);
         dataManager.saveData();
 
         String to;
