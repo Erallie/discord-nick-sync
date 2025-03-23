@@ -223,11 +223,11 @@ public class DiscordNickSync extends JavaPlugin {
                             }
                         );
                 } catch (HierarchyException e) {
-                    getLogger().warning("Cannot modify nickname for " + playerName + 
-                        "  (Discord role hierarchy issue): ensure the bot has permission and is above the user in the role list.");
+                    getLogger().warning("Cannot modify the Discord nickname for " + playerName + 
+                        ": ensure the bot has permission and is above the user in the role list.");
                     if (notifySender != null) {
                         if (notifySender != null); {
-                            notifySender.sendMessage(error + "Cannot modify nickname for " + errorHighlight + playerName + error + "  (Discord role hierarchy issue): ensure the bot has permission and is above the user in the role list.");
+                            notifySender.sendMessage(error + "Cannot modify the Discord nickname for " + errorHighlight + playerName + error + ": ensure the bot has permission and is above the user in the role list.");
                         }
                     }
                     return;
