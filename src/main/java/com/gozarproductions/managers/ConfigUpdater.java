@@ -55,14 +55,14 @@ public class ConfigUpdater {
             if (defaultStream == null) return;
             FileConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(plugin.getResource(fileName)));
 
-            // Parse default config file to collect before/after comments
             Map<String, String> commentsBefore = new LinkedHashMap<>();
             Map<String, String> commentsAfter = new LinkedHashMap<>();
             Map<Integer, String> indentPath = new HashMap<>();
             StringBuilder commentBuffer = new StringBuilder();
 
             String lastKey = null;
-            boolean blankSinceLastKey = false;
+            boolean inCommentBlock = false;
+            boolean blankBeforeComment = true;
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(defaultStream));
             String line;
@@ -70,12 +70,16 @@ public class ConfigUpdater {
                 String trimmed = line.trim();
 
                 if (trimmed.isEmpty()) {
-                    commentBuffer.append("\n");
-                    blankSinceLastKey = true;
+                    if (inCommentBlock) blankBeforeComment = true;
                     continue;
                 }
 
                 if (trimmed.startsWith("#")) {
+                    if (!inCommentBlock) {
+                        inCommentBlock = true;
+                        blankBeforeComment = false;
+                        commentBuffer.setLength(0);
+                    }
                     commentBuffer.append(line).append("\n");
                     continue;
                 }
@@ -94,16 +98,27 @@ public class ConfigUpdater {
                 String fullPath = fullPathBuilder.toString();
 
                 if (commentBuffer.length() > 0) {
-                    if (!blankSinceLastKey && lastKey != null) {
-                        commentsAfter.put(lastKey, commentBuffer.toString());
-                    } else {
-                        commentsBefore.put(fullPath, commentBuffer.toString());
+                    boolean blankAfter = false;
+                    reader.mark(1000);
+                    String nextLine = reader.readLine();
+                    if (nextLine == null || nextLine.trim().isEmpty()) {
+                        blankAfter = true;
                     }
+                    reader.reset();
+
+                    if (!blankBeforeComment && !blankAfter) {
+                        commentsBefore.put(fullPath, commentBuffer.toString());
+                    } else if (!blankBeforeComment) {
+                        commentsBefore.put(fullPath, commentBuffer.toString());
+                    } else if (!blankAfter && lastKey != null) {
+                        commentsAfter.put(lastKey, commentBuffer.toString());
+                    }
+
                     commentBuffer.setLength(0);
+                    inCommentBlock = false;
                 }
 
                 lastKey = fullPath;
-                blankSinceLastKey = false;
             }
 
             // Rebuild YAML
