@@ -3,7 +3,7 @@ name: Update Modrinth Description
 on:
   push:
     branches:
-      - main  # Or your actual branch
+      - main
 
 jobs:
   update-description:
@@ -13,22 +13,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Read README.md
-        id: readme
-        run: |
-          {
-          printf 'content<<EOF\n'
-          cat README.md
-          printf '\nEOF\n'
-          } >> "$GITHUB_OUTPUT"
-
-
       - name: Update Modrinth project description
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
         run: |
+          jq -Rs --argjson endpoint '{"body": .}' . < README.md > body.json
+
           curl -X PATCH https://api.modrinth.com/v2/project/zE5EbgF4 \
             -H "Authorization: $MODRINTH_TOKEN" \
             -H "Content-Type: application/json" \
-            -d "$(jq -n --arg body "${{ steps.readme.outputs.content }}" '{ body: $body }')"
-
+            --data @body.json
