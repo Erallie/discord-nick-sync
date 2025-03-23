@@ -16,3 +16,7 @@ replace-whitespaces-with: ""
 
 # Whether to combine whitespace characters together before replacing them with the value above.
 merge-whitespaces-before-replacing: true
+
+updater:
+  # Whether to notify admins for new snapshot releases. Admins will still be notified on stable releases.
+  notify-on-dev-release: false

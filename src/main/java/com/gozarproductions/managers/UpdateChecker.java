@@ -76,15 +76,20 @@ public class UpdateChecker {
     }
 
     private boolean isLatestVersion() {
-        String[] currentParts = currentVersion.split("\\.");
-        String[] latestParts = latestVersion.split("\\.");
-        int currentLength = currentParts.length;
+        String[] latestSplit = latestVersion.split("-");
+        // return true if is a dev release and they don't want to be notified.
+        if (latestSplit.length >= 2 && plugin.getConfig().getBoolean("updater.notify-on-dev-release") == false) {
+            return true;
+        }
+        String[] latestParts = latestSplit[0].split("\\.");
+        String[] currentParts = currentVersion.split("-")[0].split("\\.");
         int latestLength = latestParts.length;
+        int currentLength = currentParts.length;
 
         int length = Math.max(currentLength, latestLength);
         for (int i = 0; i < length; i++) {
-            int curr = i < currentLength ? Integer.parseInt(currentParts[i]) : 0;
             int lat = i < latestLength ? Integer.parseInt(latestParts[i]) : 0;
+            int curr = i < currentLength ? Integer.parseInt(currentParts[i]) : 0;
             if (curr < lat) return false;
             if (curr > lat) return true;
         }
