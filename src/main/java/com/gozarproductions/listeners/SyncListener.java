@@ -2,7 +2,6 @@ package com.gozarproductions.listeners;
 
 import com.earth2me.essentials.User;
 import com.gozarproductions.DiscordNickSync;
-import com.gozarproductions.managers.UpdateChecker;
 
 import github.scarsz.discordsrv.api.Subscribe;
 import github.scarsz.discordsrv.api.events.AccountLinkedEvent;
@@ -29,13 +28,7 @@ public class SyncListener extends ListenerAdapter implements Listener {
         // Check if the player is an admin
         if (player.hasPermission("discordnick.admin")) {
             // Check if an update is available
-            UpdateChecker updateChecker = plugin.getUpdateChecker();
-            String latestVersion = updateChecker.latestVersion;
-            String downloadUrl = updateChecker.downloadUrl;
-
-            if (latestVersion != null) {
-                updateChecker.notifyAdmins(latestVersion, downloadUrl);
-            }
+            plugin.getUpdateChecker().recallAndNotify();
         }
         plugin.syncPlayerWithMode(player, null, true);
     }

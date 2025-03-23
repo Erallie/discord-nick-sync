@@ -4,6 +4,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.gozarproductions.DiscordNickSync;
 
+import net.md_5.bungee.api.ChatColor;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -14,8 +16,10 @@ import java.net.URL;
 public class UpdateChecker {
     private final DiscordNickSync plugin;
     private final String repoUrl; // GitHub API URL
-    public String latestVersion = null;
-    public String downloadUrl = null;
+    private boolean isLatest;
+    private String latestVersion = null;
+    private String currentVersion = null;
+    private String downloadUrl = null;
 
     public UpdateChecker(DiscordNickSync plugin, String repoOwner, String repoName) {
         this.plugin = plugin;
@@ -36,17 +40,17 @@ public class UpdateChecker {
                 downloadUrl = json.get("html_url").getAsString();
 
                 // Get current plugin version
-                String currentVersion = plugin.getDescription().getVersion();
+                currentVersion = plugin.getDescription().getVersion();
+                isLatest = isLatestVersion();
 
                 // Compare versions
-                if (isLatestVersion(currentVersion, latestVersion)) {
+                if (recallAndNotify(null)) {
                     plugin.getLogger().info("Plugin is up to date.");
                 } else {
                     plugin.getLogger().warning(
                         "A new version is available: " + latestVersion +
                         "\n(Current version: " + currentVersion +
                         ")\n Download: " + downloadUrl);
-                    notifyAdmins(latestVersion, currentVersion, downloadUrl);
                 }
 
             } catch (Exception e) {
@@ -55,9 +59,21 @@ public class UpdateChecker {
         });
     }
 
-    private boolean isLatestVersion(String current, String latest) {
-        String[] currentParts = current.split("\\.");
-        String[] latestParts = latest.split("\\.");
+    public boolean recallAndNotify(Player toNotify) {
+        if (isLatest) {
+            return true;
+        } else if (toNotify != null) {
+            notify(toNotify);
+            return false;
+        } else {
+            notifyAdmins();
+            return false;
+        }
+    }
+
+    private boolean isLatestVersion() {
+        String[] currentParts = currentVersion.split("\\.");
+        String[] latestParts = latestVersion.split("\\.");
         int currentLength = currentParts.length;
         int latestLength = latestParts.length;
 
@@ -74,18 +90,22 @@ public class UpdateChecker {
     /**
      * Notifies all admins about the new update.
      */
-    private void notifyAdmins(String latestVersion, String currentVersion, String downloadUrl) {
+    private void notifyAdmins() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.hasPermission("discordnick.admin")) {
-                LanguageManager languageManager = plugin.getLanguageManager();
-                String defaultColor = languageManager.getColor("default", true);
-                String highlight = languageManager.getColor("highlight", true);
-                
-                player.sendMessage(
-                    highlight + "[" + ChatColor.BOLD + "DiscordNickSync" + highlight + "] " + defaultColor + "A new update is available: " + highlight + latestVersion +
-                    "\n" + defaultColor + "(Current version: " + highlight + currentVersion + defaultColor + ")" + 
-                    "\n" + defaultColor + "Download: " + highlight + downloadUrl);
+                notify(player);
             }
         }
+    }
+
+    private void notify(Player player) {
+        LanguageManager languageManager = plugin.getLanguageManager();
+        String defaultColor = languageManager.getColor("default", true);
+        String highlight = languageManager.getColor("highlight", true);
+        
+        player.sendMessage(
+            highlight + "[" + ChatColor.BOLD + "DiscordNickSync" + highlight + "] " + defaultColor + "A new update is available: " + highlight + latestVersion +
+            "\n" + defaultColor + "(Current version: " + highlight + currentVersion + defaultColor + ")" + 
+            "\n" + defaultColor + "Download: " + highlight + downloadUrl);
     }
 }
