@@ -3,7 +3,7 @@ name: Update Modrinth Description
 on:
   push:
     branches:
-      - main  # Change to your default branch if needed
+      - main  # Or your actual branch
 
 jobs:
   update-description:
@@ -13,13 +13,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Read README.md into environment variable
+      - name: Load README.md into env variable
         run: |
-          echo "README_CONTENT<<EOF" >> $GITHUB_ENV
-          cat README.md >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          {
+            echo 'README_CONTENT<<EOF'
+            cat README.md
+            echo 'EOF'
+          } >> "$GITHUB_ENV"
 
-      - name: Update Modrinth project description
+      - name: Update Modrinth description
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           README_CONTENT: ${{ env.README_CONTENT }}
