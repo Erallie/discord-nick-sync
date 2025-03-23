@@ -49,7 +49,7 @@ public class DiscordNickCommand implements CommandExecutor {
                     sender.sendMessage(languageManager.getMessage("errors.only_players"));
                     return true;
                 }
-                plugin.syncPlayerWithMode((Player) sender, sender, false);
+                plugin.syncPlayerWithMode((Player) sender, sender);
                 return true;
             }
 
@@ -71,7 +71,7 @@ public class DiscordNickCommand implements CommandExecutor {
                 return true;
             }
 
-            plugin.syncPlayerWithMode(targetPlayer, sender, true);
+            plugin.syncPlayerWithMode(targetPlayer, sender);
             return true;
         }
 
@@ -119,7 +119,7 @@ public class DiscordNickCommand implements CommandExecutor {
         }
         
         player.sendMessage(languageManager.getMessage("messages.mode_set", "to", to, "from", from));
-        plugin.syncPlayerWithMode(player, null, true);
+        plugin.syncPlayerWithMode(player, null);
 
         return true;
     }

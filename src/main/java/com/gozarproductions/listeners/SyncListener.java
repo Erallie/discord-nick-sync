@@ -30,14 +30,14 @@ public class SyncListener extends ListenerAdapter implements Listener {
             // Check if an update is available
             plugin.getUpdateChecker().recallAndNotify(player);
         }
-        plugin.syncPlayerWithMode(player, null, true);
+        plugin.syncPlayerWithMode(player, null);
     }
 
     @Subscribe
     public void onAccountLinked(AccountLinkedEvent event) {
         Player player = Bukkit.getPlayer(event.getPlayer().getUniqueId());
         if (player != null) {
-            plugin.syncPlayerWithMode(player, null, true);
+            plugin.syncPlayerWithMode(player, null);
         } else {
             plugin.getLogger().warning("Cannot sync newly linked account: player is null.");
         }
@@ -58,6 +58,6 @@ public class SyncListener extends ListenerAdapter implements Listener {
     }
 
     private void syncIfLinked(Player player) {
-        plugin.syncPlayerWithMode(player, null, true);
+        plugin.syncPlayerWithMode(player, null);
     }
 }

@@ -5,7 +5,6 @@ import github.scarsz.discordsrv.dependencies.jda.api.JDA;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Guild;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.User;
-import github.scarsz.discordsrv.dependencies.jda.api.exceptions.HierarchyException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -100,7 +99,7 @@ public class DiscordNickSync extends JavaPlugin {
                 if (discordId == null) continue;
 
                 String mode = dataManager.getSyncMode(uuid);
-                syncPlayerWithMode(player, null, true);
+                syncPlayerWithMode(player, null);
                 
                 if (SyncMode.fromString(mode) != SyncMode.OFF){
                     syncedCount++;
@@ -110,11 +109,10 @@ public class DiscordNickSync extends JavaPlugin {
         });
     }
         
-    public void nullWarning(String variable, Player player, CommandSender notifySender) {
+    public void nullWarning(String variable, String playerName, CommandSender notifySender) {
         String part1 = "Could not sync nicknames for ";
         String part2 = ": ";
         String part3 = " is null";
-        String playerName = player.getName();
         LanguageManager languageManager = getLanguageManager();
         String error = languageManager.getColor("error", true);
         String errorHighlight = languageManager.getColor("error_highlight", true);
@@ -131,14 +129,16 @@ public class DiscordNickSync extends JavaPlugin {
         }
     }
 
-    public void syncPlayerWithMode(Player player, CommandSender notifySender, boolean notifyOnSucceed) {
+    public void syncPlayerWithMode(Player player, CommandSender notifySender) {
         SyncMode syncMode = SyncMode.fromString(dataManager.getSyncMode(player.getUniqueId()));
+        
+        String playerName = player.getName();
 
         if (syncMode == SyncMode.OFF) {    
             if (notifySender != null) {
                 notifySender.sendMessage(languageManager.getMessage(
                     "messages.sync_disabled",
-                    "player", player.getName()
+                    "player", playerName
                 ));
             }
             return;
@@ -149,13 +149,13 @@ public class DiscordNickSync extends JavaPlugin {
         JDA jda = discordSRV.getJda();
         String discordId = discordSRV.getAccountLinkManager().getDiscordId(uuid);
         if (discordId == null) {
-            nullWarning("discordId", player, notifySender);
+            nullWarning("discordId", playerName, notifySender);
             return;
         }
 
         User discordUser = jda.getUserById(discordId);
         if (discordUser == null) {
-            nullWarning("discordUser", player, notifySender);
+            nullWarning("discordUser", playerName, notifySender);
             return;
         }
 
@@ -163,7 +163,7 @@ public class DiscordNickSync extends JavaPlugin {
 
         Member discordMember = guild.getMember(discordUser);
         if (discordMember == null) {
-            nullWarning("discordMember", player, notifySender);
+            nullWarning("discordMember", playerName, notifySender);
             return;
         }
 
@@ -205,27 +205,33 @@ public class DiscordNickSync extends JavaPlugin {
         String to;
         String newNick;
         
+        String error = languageManager.getColor("error", true);
+        String errorHighlight = languageManager.getColor("error_highlight", true);
+        
         switch (syncMode) {
             case MINECRAFT:
                 from = "Minecraft";
                 to = "Discord";
                 newNick = minecraftNick;
-                guild
-                    .modifyNickname(discordMember, newNick)
-                    .queue(
-                        success -> {
-                            getLogger().info("Updated Discord nickname for " + player.getName() + " to " + newNick);
-                        },
-                        failure -> {
-                            if (failure instanceof HierarchyException) {
-                                getLogger().warning("Cannot modify nickname for " + player.getName() + 
-                                    " (Discord role hierarchy issue). Ensure the bot has permission and is above the user in the role list.");
-                            } else {
-                                getLogger().warning("Failed to update Discord nickname for " + player.getName() +
-                                    ": " + failure.getLocalizedMessage());
+                try {
+                    guild
+                        .modifyNickname(discordMember, newNick)
+                        .queue(
+                            success -> {
+                                getLogger().info("Updated Discord nickname for " + playerName + " to " + newNick);
                             }
+                        );
+                } catch (Exception e) {
+                    String localizedError = e.getLocalizedMessage();
+                    getLogger().warning("Cannot modify nickname for " + playerName + 
+                        ": " + localizedError);
+                    if (notifySender != null) {
+                        if (notifySender != null); {
+                            notifySender.sendMessage(error + "Cannot modify nickname for " + errorHighlight + playerName + error + ": " + localizedError);
                         }
-                    );
+                    }
+                    return;
+                }
                 break;
             case DISCORD:
                 from = "Discord";
@@ -236,30 +242,37 @@ public class DiscordNickSync extends JavaPlugin {
                         try {
                             essentials.getUser(player).setNickname(newNick);
                         } catch (Exception e) {
-                            getLogger().warning("Failed to update nickname for " + player.getName() + e.getLocalizedMessage());
+                            String localizedError = e.getLocalizedMessage();
+                            getLogger().warning("Failed to update nickname for " + playerName + localizedError);
+                            if (notifySender != null) {
+                                notifySender.sendMessage(error + "Failed to update nickname for " + errorHighlight + playerName + error + ": " + localizedError);
+                            }
+                            return;
                         }
                     });
                 } else {
-                    getLogger().warning("Could not sync Discord nickname to Minecraft for " + player.getDisplayName() + ": essentials could not be found");
+                    getLogger().warning("Could not sync Discord nickname to Minecraft for " + playerName + ": essentials could not be found");
+                    if (notifySender != null) {
+                        notifySender.sendMessage(error + "Could not sync Discord nickname to Minecraft for " + errorHighlight + playerName + error + ": essentials could not be found");
+                    }
                     return;
                 }
                 break;
             default:
                 return;
         }
-        if (notifySender == null || notifyOnSucceed) {
-            player.sendMessage(
-                languageManager.getMessage(
-                    "messages.nickname_updated",
-                    "to", to,
-                    "from", from,
-                    "nickname", newNick
-                ) + "\n" +
-                languageManager.getMessage("messages.sync_notif")
-            );
-        }
+
+        player.sendMessage(
+            languageManager.getMessage(
+                "messages.nickname_updated",
+                "to", to,
+                "from", from,
+                "nickname", newNick
+            ) + "\n" +
+            languageManager.getMessage("messages.sync_notif")
+        );
         
-        if (notifySender != null) {
+        if (player != notifySender && notifySender != null) {
             notifySender.sendMessage(languageManager.getMessage(
                 "messages.sync_success",
                 "player", newNick,
