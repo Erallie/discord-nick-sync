@@ -42,36 +42,114 @@ public class ConfigUpdater {
      */
     private void updateYamlFile(String fileName) {
         File file = new File(plugin.getDataFolder(), fileName);
+        if (!file.exists()) return;
 
-        // Load current file (user's existing version)
-        FileConfiguration currentConfig = YamlConfiguration.loadConfiguration(file);
+        try {
+            FileConfiguration userConfig = YamlConfiguration.loadConfiguration(file);
 
-        // Load default file from JAR
-        InputStream defaultStream = plugin.getResource(fileName);
-        if (defaultStream == null) return; // No default file found in JAR
+            InputStream defaultStream = plugin.getResource(fileName);
+            if (defaultStream == null) return;
 
-        FileConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defaultStream));
+            FileConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(plugin.getResource(fileName)));
 
-        boolean updated = false;
+            BufferedReader reader = new BufferedReader(new InputStreamReader(defaultStream));
+            StringBuilder updatedYaml = new StringBuilder();
+            StringBuilder commentBuffer = new StringBuilder();
 
-        // Check for missing keys and add them
-        for (String key : defaultConfig.getKeys(true)) {
-            if (!currentConfig.contains(key)) {
-                currentConfig.set(key, defaultConfig.get(key));
-                updated = true;
+            boolean updated = false;
+
+            while (true) {
+                String line = reader.readLine();
+                if (line == null) break;
+
+                String trimmed = line.trim();
+
+                if (trimmed.isEmpty() || trimmed.startsWith("#")) {
+                    commentBuffer.append(line).append("\n");
+                    continue;
+                }
+
+                int colonIndex = line.indexOf(":");
+                if (colonIndex == -1) {
+                    updatedYaml.append(commentBuffer).append(line).append("\n");
+                    commentBuffer.setLength(0);
+                    continue;
+                }
+
+                // Determine indentation and key
+                String indentation = line.substring(0, colonIndex).replaceAll("[^\\s]", ""); // preserve leading whitespace
+                String rawKey = line.substring(0, colonIndex).trim();
+                String fullKey = getFullYamlKey(line, indentation);
+
+                Object value = userConfig.contains(fullKey)
+                    ? userConfig.get(fullKey)
+                    : defaultConfig.get(fullKey);
+
+                if (!userConfig.contains(fullKey)) {
+                    userConfig.set(fullKey, value);
+                    updated = true;
+                }
+
+                // Write comment, then key: value
+                updatedYaml.append(commentBuffer);
+                updatedYaml.append(indentation)
+                        .append(rawKey)
+                        .append(": ")
+                        .append(formatYamlValue(value, indentation.length()))
+                        .append("\n");
+
+                commentBuffer.setLength(0);
             }
-        }
 
-        // Save if changes were made
-        if (updated) {
-            try {
-                currentConfig.save(file);
-                plugin.getLogger().info("Updated " + fileName + " with new settings.");
-            } catch (IOException e) {
-                plugin.getLogger().severe("Could not update " + fileName + ": " + e.getLocalizedMessage());
+            if (updated) {
+                try (FileWriter writer = new FileWriter(file)) {
+                    writer.write(updatedYaml.toString());
+                }
+                plugin.getLogger().info("Updated " + fileName + " with new settings and comments.");
             }
+
+        } catch (IOException e) {
+            plugin.getLogger().severe("Could not update " + fileName + ": " + e.getLocalizedMessage());
         }
     }
+
+    private String getFullYamlKey(String line, String indentation) {
+        int indentSize = indentation.length();
+        String rawKey = line.substring(0, line.indexOf(":")).trim();
+
+        // Track parent keys by indentation level
+        if (keyStack == null) keyStack = new java.util.TreeMap<>();
+        keyStack.put(indentSize, rawKey);
+
+        // Build full path
+        StringBuilder fullKey = new StringBuilder();
+        for (int i = 0; i <= indentSize; i++) {
+            if (keyStack.containsKey(i)) {
+                if (fullKey.length() > 0) fullKey.append(".");
+                fullKey.append(keyStack.get(i));
+            }
+        }
+        return fullKey.toString();
+    }
+
+    private String formatYamlValue(Object value, int indentLevel) {
+        if (value == null) return "null";
+        if (value instanceof String) return "\"" + value + "\"";
+        if (value instanceof Boolean || value instanceof Number) return value.toString();
+        if (value instanceof java.util.List) {
+            StringBuilder listYaml = new StringBuilder("\n");
+            for (Object item : (java.util.List<?>) value) {
+                for (int i = 0; i < indentLevel + 2; i++) listYaml.append(" ");
+                listYaml.append("- ").append(item).append("\n");
+            }
+            return listYaml.toString().trim();
+        }
+        return "\"" + value.toString() + "\"";
+    }
+
+    private java.util.TreeMap<Integer, String> keyStack;
+
+
 
     /**
      * Updates data.json by adding missing keys without overwriting existing data.
