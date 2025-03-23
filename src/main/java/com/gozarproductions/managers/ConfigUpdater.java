@@ -88,6 +88,7 @@ public class ConfigUpdater {
                 }
             }
             //#endregion
+            
             //#region Rebuild YAML with preserved comments and values
             StringBuilder output = new StringBuilder();
             writeSection(output, defaultConfig, 0, "", userConfig, commentMap);
