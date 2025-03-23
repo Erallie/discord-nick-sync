@@ -55,11 +55,13 @@ public class UpdateChecker {
     private boolean isLatestVersion(String current, String latest) {
         String[] currentParts = current.split("\\.");
         String[] latestParts = latest.split("\\.");
+        int currentLength = currentParts.length;
+        int latestLength = latestParts.length;
 
-        int length = Math.max(currentParts.length, latestParts.length);
+        int length = Math.max(currentLength, latestLength);
         for (int i = 0; i < length; i++) {
-            int curr = i < currentParts.length ? Integer.parseInt(currentParts[i]) : 0;
-            int lat = i < latestParts.length ? Integer.parseInt(latestParts[i]) : 0;
+            int curr = i < currentLength ? Integer.parseInt(currentParts[i]) : 0;
+            int lat = i < latestLength ? Integer.parseInt(latestParts[i]) : 0;
             if (curr < lat) return false;
             if (curr > lat) return true;
         }
