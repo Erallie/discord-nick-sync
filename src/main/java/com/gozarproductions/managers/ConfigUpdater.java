@@ -41,33 +41,36 @@ public class ConfigUpdater {
         if (!file.exists()) return;
 
         try {
-            // Load user's current values
             FileConfiguration userConfig = YamlConfiguration.loadConfiguration(file);
-
-            // Load default file as plain text
             InputStream defaultStream = plugin.getResource(fileName);
             if (defaultStream == null) return;
-            BufferedReader reader = new BufferedReader(new InputStreamReader(defaultStream));
 
-            StringBuilder result = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (!line.trim().isEmpty() && !line.trim().startsWith("#") && line.contains(":")) {
-                    // Extract key path (e.g., a.b.c)
-                    String indent = line.substring(0, line.indexOf(line.trim()));
-                    String key = line.trim().split(":")[0];
-                    String path = buildFullPath(line, indent);
-
-                    Object userValue = userConfig.get(path);
-                    if (userValue != null) {
-                        line = indent + key + ": " + formatYamlValue(userValue);
-                    }
+            // Read the entire default config as text
+            StringBuilder defaultText = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(defaultStream))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    defaultText.append(line).append("\n");
                 }
-                result.append(line).append("\n");
+            }
+
+            // Replace any values in the default text with the user's values
+            String mergedText = defaultText.toString();
+            for (String key : userConfig.getKeys(true)) {
+                Object userValue = userConfig.get(key);
+                if (userValue == null) continue;
+                String userFormatted = formatYamlValue(userValue);
+
+                // Escape regex characters in the key pattern
+                String regexKeyPattern = "(?m)^([ \t]*)" + key.replace(".", "[ \\t]*\\n?\\1") + ": .*?$";
+                String replacement = "$1" + key.substring(key.lastIndexOf('.') + 1) + ": " + userFormatted;
+
+                // Try replacing the value in-place
+                mergedText = mergedText.replaceAll(regexKeyPattern, replacement);
             }
 
             try (FileWriter writer = new FileWriter(file)) {
-                writer.write(result.toString());
+                writer.write(mergedText);
             }
 
             plugin.getLogger().info("Updated " + fileName + " with user values merged into the latest default.");
@@ -75,17 +78,6 @@ public class ConfigUpdater {
         } catch (IOException e) {
             plugin.getLogger().severe("Could not update " + fileName + ": " + e.getLocalizedMessage());
         }
-    }
-
-    private String buildFullPath(String line, String indent) {
-        String[] parts = line.trim().split(":")[0].split("\\.");
-        int indentLevel = indent.length() / 2; // assuming 2 spaces per indent
-        StringBuilder path = new StringBuilder();
-        for (int i = 0; i <= indentLevel && i < parts.length; i++) {
-            if (i > 0) path.append(".");
-            path.append(parts[i]);
-        }
-        return path.toString();
     }
 
     private String formatYamlValue(Object value) {
