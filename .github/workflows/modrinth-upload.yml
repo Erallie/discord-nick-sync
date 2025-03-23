@@ -73,8 +73,52 @@ jobs:
         env:
             MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
         run: |
-            curl -X POST https://api.modrinth.com/v2/version \
-                -H "Authorization: $MODRINTH_TOKEN" \
-                -H "Content-Type: multipart/form-data" \
-                -F "data=@version.json;type=application/json" \
-                -F "file=@$ASSET_NAME;type=application/java-archive"
+            set -e
+
+            echo "Uploading to Modrinth..."
+
+            max_retries=3
+            attempt=1
+            sleep_time=5
+
+            while [ "$attempt" -le "$max_retries" ]; do
+                echo "Attempt $attempt of $max_retries"
+
+                response=$(curl -s -w "\n%{http_code}" -X POST https://api.modrinth.com/v2/version \
+                    -H "Authorization: $MODRINTH_TOKEN" \
+                    -H "Content-Type: multipart/form-data" \
+                    -F "data=@version.json;type=application/json" \
+                    -F "file=@$ASSET_NAME;type=application/java-archive")
+
+                body=$(echo "$response" | head -n -1)
+                status=$(echo "$response" | tail -n 1)
+
+                echo "Response Status: $status"
+
+                if [[ "$status" -eq 200 || "$status" -eq 201 ]]; then
+                    echo "✅ Successfully uploaded to Modrinth!"
+                    break
+                elif [[ "$status" -ge 500 ]]; then
+                    echo "🔁 Server error ($status), retrying in $sleep_time seconds..."
+                    sleep "$sleep_time"
+                    attempt=$((attempt + 1))
+                    continue
+                else
+                    echo "❌ Upload failed with status $status"
+                    echo "🔍 Modrinth Error:"
+
+                    if command -v jq &> /dev/null; then
+                        echo "$body" | jq
+                    else
+                        echo "$body"
+                    fi
+
+                    exit 1
+                fi
+            done
+
+            if [[ "$attempt" -gt "$max_retries" ]]; then
+                echo "❌ Upload failed after $max_retries attempts. Giving up."
+                exit 1
+            fi
+
