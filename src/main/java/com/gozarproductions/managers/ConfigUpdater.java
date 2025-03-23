@@ -67,8 +67,6 @@ public class ConfigUpdater {
         }
     }
 
-
-
     /**
      * Updates a YAML file by adding missing keys without overwriting existing values.
      */
@@ -127,8 +125,6 @@ public class ConfigUpdater {
             plugin.getLogger().severe("Could not update " + fileName + ": " + e.getLocalizedMessage());
         }
     }
-    
-
 
     private String formatYamlValue(Object value, int indentLevel) {
         if (value == null) return "null";
@@ -144,9 +140,6 @@ public class ConfigUpdater {
         }
         return "\"" + value.toString() + "\"";
     }
-
-
-
 
     /**
      * Updates data.json by adding missing keys without overwriting existing data.
