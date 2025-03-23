@@ -17,7 +17,7 @@ public class DataManager {
     private final DiscordNickSync plugin;
     private final File dataFile;
     private final Gson gson;
-    private Map<UUID, String> syncPreferences;
+    private Map<UUID, SyncMode> syncPreferences;
 
     public DataManager(File pluginFolder, DiscordNickSync plugin) {
         this.plugin = plugin;
@@ -44,7 +44,8 @@ public class DataManager {
             if (loadedData != null) {
                 syncPreferences.clear();
                 for (Map.Entry<String, String> entry : loadedData.entrySet()) {
-                    syncPreferences.put(UUID.fromString(entry.getKey()), entry.getValue());
+                    SyncMode mode = SyncMode.fromString(entry.getValue());
+                    syncPreferences.put(UUID.fromString(entry.getKey()), mode);
                 }
             }
         } catch (IOException e) {
@@ -59,10 +60,9 @@ public class DataManager {
         try (Writer writer = new FileWriter(dataFile)) {
             // Convert UUID keys to Strings before saving
             Map<String, String> convertedData = new HashMap<>();
-            for (Map.Entry<UUID, String> entry : syncPreferences.entrySet()) {
-                convertedData.put(entry.getKey().toString(), entry.getValue());
+            for (Map.Entry<UUID, SyncMode> entry : syncPreferences.entrySet()) {
+                convertedData.put(entry.getKey().toString(), entry.getValue().toString());
             }
-
             gson.toJson(convertedData, writer);
         } catch (IOException e) {
             plugin.getLogger().severe(e.getLocalizedMessage());
@@ -72,22 +72,22 @@ public class DataManager {
     /**
      * Sets the sync mode for a player in memory (but does NOT save immediately).
      */
-    public void setSyncMode(UUID uuid, String mode) {
-        syncPreferences.put(uuid, mode.toLowerCase());
+    public void setSyncMode(UUID uuid, SyncMode mode) {
+        syncPreferences.put(uuid, mode);
     }
 
     /**
      * Gets the sync mode for a player. Defaults to "discord" if not set.
      */
-    public String getSyncMode(UUID uuid) {
-        String storedMode = syncPreferences.get(uuid);
+    public SyncMode getSyncMode(UUID uuid) {
+        SyncMode storedMode = syncPreferences.get(uuid);
 
         if (storedMode == null) {
             // If no specific setting exists, get the default sync mode from config.yml
             String defaultMode = plugin.getConfig().getString("default-sync", "discord");
-            return SyncMode.fromString(defaultMode).name();
+            return SyncMode.fromString(defaultMode);
         }
-        return SyncMode.fromString(storedMode).name();
+        return storedMode;
     }
 
 }

@@ -99,10 +99,10 @@ public class DiscordNickSync extends JavaPlugin {
                 String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(uuid);
                 if (discordId == null) continue;
 
-                String mode = dataManager.getSyncMode(uuid);
+                SyncMode mode = dataManager.getSyncMode(uuid);
                 syncPlayerWithMode(player, null);
                 
-                if (SyncMode.fromString(mode) != SyncMode.OFF){
+                if (mode != SyncMode.OFF){
                     syncedCount++;
                 }
             }
@@ -131,7 +131,7 @@ public class DiscordNickSync extends JavaPlugin {
     }
 
     public void syncPlayerWithMode(Player player, CommandSender notifySender) {
-        SyncMode syncMode = SyncMode.fromString(dataManager.getSyncMode(player.getUniqueId()));
+        SyncMode syncMode = dataManager.getSyncMode(player.getUniqueId());
         
         String playerName = player.getName();
 
@@ -226,9 +226,7 @@ public class DiscordNickSync extends JavaPlugin {
                     getLogger().warning("Cannot modify the Discord nickname for " + playerName + 
                         ": ensure the bot has permission and is above the user in the role list.");
                     if (notifySender != null) {
-                        if (notifySender != null); {
-                            notifySender.sendMessage(error + "Cannot modify the Discord nickname for " + errorHighlight + playerName + error + ": ensure the bot has permission and is above the user in the role list.");
-                        }
+                        notifySender.sendMessage(error + "Cannot modify the Discord nickname for " + errorHighlight + playerName + error + ": ensure the bot has permission and is above the user in the role list.");
                     }
                     return;
                 } catch (Exception e) {
@@ -236,9 +234,7 @@ public class DiscordNickSync extends JavaPlugin {
                     getLogger().warning("Cannot modify nickname for " + playerName + 
                         ": " + localizedError);
                     if (notifySender != null) {
-                        if (notifySender != null); {
-                            notifySender.sendMessage(error + "Cannot modify nickname for " + errorHighlight + playerName + error + ": " + localizedError);
-                        }
+                        notifySender.sendMessage(error + "Cannot modify nickname for " + errorHighlight + playerName + error + ": " + localizedError);
                     }
                     return;
                 }
@@ -293,7 +289,6 @@ public class DiscordNickSync extends JavaPlugin {
     }
 
     public void reloadPluginConfig() {
-        saveDefaultConfig();
         reloadConfig(); // Reload config.yml from disk
         languageManager.loadLanguageFile();
         dataManager.loadData(); // Reload data.json if needed
