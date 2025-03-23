@@ -5,10 +5,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.gozarproductions.DiscordNickSync;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class ConfigUpdater {
     private final DiscordNickSync plugin;
@@ -32,10 +36,38 @@ public class ConfigUpdater {
             updateJsonFile();
 
             // Save the new version to config.yml
+            plugin.reloadConfig();
             plugin.getConfig().set("internal.plugin-version", currentVersion);
             plugin.saveConfig();
         }
     }
+
+    private void writeSection(StringBuilder yaml, ConfigurationSection section, int indent, String pathPrefix, FileConfiguration userConfig, Map<String, String> commentMap) {
+        for (String key : section.getKeys(false)) {
+            Object value = section.get(key);
+            String fullPath = pathPrefix.isEmpty() ? key : pathPrefix + "." + key;
+
+            // Build indent
+            StringBuilder indentBuilder = new StringBuilder();
+            for (int i = 0; i < indent; i++) indentBuilder.append(" ");
+            String indentStr = indentBuilder.toString();
+
+            // Insert comment before key (if exists)
+            if (commentMap.containsKey(fullPath)) {
+                yaml.append(commentMap.get(fullPath));
+            }
+
+            if (value instanceof ConfigurationSection) {
+                yaml.append(indentStr).append(key).append(":\n");
+                writeSection(yaml, (ConfigurationSection) value, indent + 2, fullPath, userConfig, commentMap);
+            } else {
+                Object val = userConfig.contains(fullPath) ? userConfig.get(fullPath) : value;
+                yaml.append(indentStr).append(key).append(": ").append(formatYamlValue(val, indent)).append("\n");
+            }
+        }
+    }
+
+
 
     /**
      * Updates a YAML file by adding missing keys without overwriting existing values.
@@ -46,91 +78,57 @@ public class ConfigUpdater {
 
         try {
             FileConfiguration userConfig = YamlConfiguration.loadConfiguration(file);
-
             InputStream defaultStream = plugin.getResource(fileName);
             if (defaultStream == null) return;
-
             FileConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(plugin.getResource(fileName)));
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(defaultStream));
-            StringBuilder updatedYaml = new StringBuilder();
+            // Step 1: Parse default config file to collect comments per full key
+            Map<String, String> commentMap = new LinkedHashMap<>();
+            Map<Integer, String> indentPath = new HashMap<>();
             StringBuilder commentBuffer = new StringBuilder();
 
-            boolean updated = false;
-
-            while (true) {
-                String line = reader.readLine();
-                if (line == null) break;
-
+            BufferedReader reader = new BufferedReader(new InputStreamReader(defaultStream));
+            String line;
+            while ((line = reader.readLine()) != null) {
                 String trimmed = line.trim();
-
                 if (trimmed.isEmpty() || trimmed.startsWith("#")) {
                     commentBuffer.append(line).append("\n");
                     continue;
                 }
 
-                int colonIndex = line.indexOf(":");
-                if (colonIndex == -1) {
-                    updatedYaml.append(commentBuffer).append(line).append("\n");
+                int indent = line.indexOf(trimmed); // number of leading spaces
+                String key = trimmed.split(":")[0].trim();
+                indentPath.put(indent, key);
+
+                // Build full path from indentPath
+                StringBuilder fullPath = new StringBuilder();
+                for (int i = 0; i <= indent; i++) {
+                    if (indentPath.containsKey(i)) {
+                        if (fullPath.length() > 0) fullPath.append(".");
+                        fullPath.append(indentPath.get(i));
+                    }
+                }
+
+                if (commentBuffer.length() > 0) {
+                    commentMap.put(fullPath.toString(), commentBuffer.toString());
                     commentBuffer.setLength(0);
-                    continue;
                 }
-
-                // Determine indentation and key
-                String indentation = line.substring(0, colonIndex).replaceAll("[^\\s]", ""); // preserve leading whitespace
-                String rawKey = line.substring(0, colonIndex).trim();
-                String fullKey = getFullYamlKey(line, indentation);
-
-                Object value = userConfig.contains(fullKey)
-                    ? userConfig.get(fullKey)
-                    : defaultConfig.get(fullKey);
-
-                if (!userConfig.contains(fullKey)) {
-                    userConfig.set(fullKey, value);
-                    updated = true;
-                }
-
-                // Write comment, then key: value
-                updatedYaml.append(commentBuffer);
-                updatedYaml.append(indentation)
-                        .append(rawKey)
-                        .append(": ")
-                        .append(formatYamlValue(value, indentation.length()))
-                        .append("\n");
-
-                commentBuffer.setLength(0);
             }
 
-            if (updated) {
-                try (FileWriter writer = new FileWriter(file)) {
-                    writer.write(updatedYaml.toString());
-                }
-                plugin.getLogger().info("Updated " + fileName + " with new settings and comments.");
+            // Step 2: Rebuild YAML with preserved comments and values
+            StringBuilder output = new StringBuilder();
+            writeSection(output, defaultConfig, 0, "", userConfig, commentMap);
+            try (FileWriter writer = new FileWriter(file)) {
+                writer.write(output.toString());
             }
 
+            plugin.getLogger().info("Updated " + fileName + ".");
         } catch (IOException e) {
             plugin.getLogger().severe("Could not update " + fileName + ": " + e.getLocalizedMessage());
         }
     }
+    
 
-    private String getFullYamlKey(String line, String indentation) {
-        int indentSize = indentation.length();
-        String rawKey = line.substring(0, line.indexOf(":")).trim();
-
-        // Track parent keys by indentation level
-        if (keyStack == null) keyStack = new java.util.TreeMap<>();
-        keyStack.put(indentSize, rawKey);
-
-        // Build full path
-        StringBuilder fullKey = new StringBuilder();
-        for (int i = 0; i <= indentSize; i++) {
-            if (keyStack.containsKey(i)) {
-                if (fullKey.length() > 0) fullKey.append(".");
-                fullKey.append(keyStack.get(i));
-            }
-        }
-        return fullKey.toString();
-    }
 
     private String formatYamlValue(Object value, int indentLevel) {
         if (value == null) return "null";
@@ -147,7 +145,6 @@ public class ConfigUpdater {
         return "\"" + value.toString() + "\"";
     }
 
-    private java.util.TreeMap<Integer, String> keyStack;
 
 
 
