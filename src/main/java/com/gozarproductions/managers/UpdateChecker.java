@@ -60,6 +60,9 @@ public class UpdateChecker {
     }
 
     public boolean recallAndNotify(Player toNotify) {
+        if (latestVersion == null) {
+            return false;
+        }
         if (isLatest) {
             return true;
         } else if (toNotify != null) {
