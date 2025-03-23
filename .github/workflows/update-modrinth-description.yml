@@ -13,20 +13,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Load README.md into env variable
+      - name: Read README.md
+        id: readme
         run: |
           {
-            echo 'README_CONTENT<<EOF'
-            cat README.md
-            echo 'EOF'
-          } >> "$GITHUB_ENV"
+          printf 'content<<EOF\n'
+          cat README.md
+          printf '\nEOF\n'
+          } >> "$GITHUB_OUTPUT"
 
-      - name: Update Modrinth description
+
+      - name: Update Modrinth project description
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-          README_CONTENT: ${{ env.README_CONTENT }}
         run: |
           curl -X PATCH https://api.modrinth.com/v2/project/zE5EbgF4 \
             -H "Authorization: $MODRINTH_TOKEN" \
             -H "Content-Type: application/json" \
-            -d "$(jq -n --arg body "$README_CONTENT" '{ body: $body }')"
+            -d "$(jq -n --arg body "${{ steps.readme.outputs.content }}" '{ body: $body }')"
+
