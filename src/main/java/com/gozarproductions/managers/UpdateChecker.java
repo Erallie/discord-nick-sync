@@ -61,6 +61,7 @@ public class UpdateChecker {
 
     public boolean recallAndNotify(Player toNotify) {
         if (latestVersion == null) {
+            //!TODO: notify admins if you can't find the latest version.
             return false;
         }
         if (isLatest) {
