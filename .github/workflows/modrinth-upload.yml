@@ -40,19 +40,30 @@ jobs:
             run: |
                 echo "${{ github.event.release.body }}" > changelog.txt
 
+                prerelease=${{ github.event.release.prerelease }}
+                if [ "$prerelease" = "true" ]; then
+                    channel="beta"
+                    featured=false
+                else
+                    channel="release"
+                    featured=true
+                fi
+
                 jq -n \
                 --arg name "${{ github.event.release.name }}" \
                 --arg version "${{ github.ref_name }}" \
                 --arg changelog "$(cat changelog.txt)" \
                 --arg file "$ASSET_NAME" \
+                --arg channel "$channel" \
+                --argjson featured "$featured" \
                 '{
                     name: $name,
                     version_number: $version,
                     project_id: "tles3bfw",
                     game_versions: ["1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4"],
                     loaders: ["spigot", "paper", "purpur"],
-                    featured: true,
-                    release_channel: "release",
+                    featured: $featured,
+                    release_channel: $channel,
                     changelog: $changelog,
                     dependencies: [
                     {
