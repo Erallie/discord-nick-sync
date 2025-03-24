@@ -38,12 +38,6 @@ jobs:
 
           - name: Prepare Modrinth metadata
             run: |
-                CONFIG=$(cat modrinth-config.json)
-                PROJECT_ID=$(echo "$CONFIG" | jq -r '.project_id')
-                LOADERS=$(echo "$CONFIG" | jq -c '.loaders')
-                GAME_VERSIONS=$(echo "$CONFIG" | jq -c '.game_versions')
-                DEPENDENCIES=$(echo "$CONFIG" | jq -c '.dependencies')
-
                 echo "${{ github.event.release.body }}" > changelog.txt
 
                 prerelease=${{ github.event.release.prerelease }}
@@ -69,21 +63,27 @@ jobs:
                 --arg file "$ASSET_NAME" \
                 --arg channel "$channel" \
                 --argjson featured "$featured" \
-                --argjson game_versions "$GAME_VERSIONS" \
-                --argjson loaders "$LOADERS" \
-                --argjson dependencies "$DEPENDENCIES" \
-                --arg project_id "$PROJECT_ID" \
-
                 '{
                     name: $name,
                     version_number: $version,
-                    project_id: $project_id,
-                    game_versions: $game_versions,
-                    loaders: $loaders,
+                    project_id: "tles3bfw",
+                    game_versions: ["1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4"],
+                    loaders: ["spigot", "paper", "purpur"],
                     featured: $featured,
                     release_channel: $channel,
                     changelog: $changelog,
-                    dependencies: $dependencies,
+                    dependencies: [
+                    {
+                        version: "*",
+                        project_id: "UmLGoGij",
+                        dependency_type: "required"
+                    },
+                    {
+                        version: "*",
+                        project_id: "hXiIvTyT",
+                        dependency_type: "required"
+                    }
+                    ],
                     file_parts: [$file]
                 }' > version.json
 

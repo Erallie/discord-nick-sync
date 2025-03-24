@@ -22,12 +22,9 @@ jobs:
                 echo "Preparing description payload..."
                 jq -Rs --arg body "$(cat README.md)" '{ body: $body }' > body.json
 
-                CONFIG=$(cat modrinth-config.json)
-                PROJECT_ID=$(echo "$CONFIG" | jq -r '.project_id')
-
                 echo "Sending PATCH request to Modrinth..."
 
-                response=$(curl -s -w "\n%{http_code}" -X PATCH https://api.modrinth.com/v2/project/$PROJECT_ID \
+                response=$(curl -s -w "\n%{http_code}" -X PATCH https://api.modrinth.com/v2/project/tles3bfw \
                     -H "Authorization: $MODRINTH_TOKEN" \
                     -H "Content-Type: application/json" \
                     --data @body.json)
