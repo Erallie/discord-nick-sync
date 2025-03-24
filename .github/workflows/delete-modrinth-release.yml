@@ -1,0 +1,64 @@
+name: Delete Modrinth Release
+
+on:
+    release:
+        types: [deleted]
+
+jobs:
+    delete-modrinth:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Delete corresponding Modrinth release
+            env:
+                MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+                RELEASE_TAG: ${{ github.event.release.tag_name }}
+            run: |
+                set -e
+
+                echo "Looking for Modrinth version with tag: $RELEASE_TAG"
+
+                PROJECT_ID="tles3bfw"
+                API_URL="https://api.modrinth.com/v2/project/$PROJECT_ID/version"
+
+                VERSION_DATA=$(curl -s -H "Authorization: $MODRINTH_TOKEN" "$API_URL")
+                VERSION_JSON=$(echo "$VERSION_DATA" | jq -r --arg TAG "$RELEASE_TAG" '.[] | select(.version_number == $TAG)')
+
+                if [ -z "$VERSION_JSON" ]; then
+                    echo "❗ No Modrinth release found for tag $RELEASE_TAG"
+                    exit 0
+                fi
+
+                VERSION_ID=$(echo "$VERSION_JSON" | jq -r '.id')
+                VERSION_PROJECT_ID=$(echo "$VERSION_JSON" | jq -r '.project_id')
+
+                echo "Found version ID: $VERSION_ID (project_id: $VERSION_PROJECT_ID)"
+
+                # ✅ Safety check
+                if [ "$VERSION_PROJECT_ID" != "$PROJECT_ID" ]; then
+                    echo "🚫 Version $VERSION_ID does not belong to project $PROJECT_ID"
+                    echo "Aborting delete to avoid accidental cross-project removal."
+                    exit 1
+                fi
+
+                DELETE_URL="https://api.modrinth.com/v2/version/$VERSION_ID"
+                echo "Deleting Modrinth version ID: $VERSION_ID"
+
+                response=$(curl -s -w "\n%{http_code}" -X DELETE "$DELETE_URL" \
+                    -H "Authorization: $MODRINTH_TOKEN")
+
+                body=$(echo "$response" | head -n -1)
+                status=$(echo "$response" | tail -n 1)
+
+                echo "Response Status: $status"
+
+                if [[ "$status" -eq 204 ]]; then
+                    echo "✅ Successfully deleted Modrinth release for tag $RELEASE_TAG"
+                else
+                    echo "❌ Failed to delete Modrinth release (status $status)"
+                    if command -v jq &> /dev/null; then
+                        echo "$body" | jq
+                    else
+                        echo "$body"
+                    fi
+                    exit 1
+                fi

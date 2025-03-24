@@ -42,12 +42,19 @@ jobs:
 
                 prerelease=${{ github.event.release.prerelease }}
                 if [ "$prerelease" = "true" ]; then
+                    echo "🔶 Prerelease detected — setting to beta and not featured"
                     channel="beta"
                     featured=false
                 else
                     channel="release"
-                    featured=true
-                fi
+                    if [[ "$IS_LATEST" == "true" ]]; then
+                        echo "🌟 Latest release — setting as featured"
+                        featured=true
+                    else
+                        echo "ℹ️ Not latest — not featured"
+                        featured=false
+                    fi
+                fi                
 
                 jq -n \
                 --arg name "${{ github.event.release.name }}" \
