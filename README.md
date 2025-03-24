@@ -1,4 +1,4 @@
-# DiscordNickSync
+# ![DiscordNickSync](https://raw.githubusercontent.com/Erallie/discord-nick-sync/main/icons/banner/banner-press-12.png)
 [Our Discord](https://discord.gg/cCCEk7BX4W) | [Our Other Projects](https://github.com/Erallie) | [Modrinth](https://modrinth.com/plugin/discordnicksync)
 
 DiscordNickSync is a plugin for Minecraft Java Edition that lets your players sync their Discord nickname to their Essentials nickname, and vice versa, via [DiscordSRV](https://modrinth.com/plugin/discordsrv).
