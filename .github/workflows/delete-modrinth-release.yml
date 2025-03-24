@@ -8,6 +8,11 @@ jobs:
     delete-modrinth:
         runs-on: ubuntu-latest
         steps:
+          - name: Load Modrinth config
+            run: |
+                CONFIG=$(cat modrinth-config.json)
+                PROJECT_ID=$(echo "$CONFIG" | jq -r '.project_id')
+
           - name: Delete corresponding Modrinth release
             env:
                 MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
@@ -17,7 +22,6 @@ jobs:
 
                 echo "Looking for Modrinth version with tag: $RELEASE_TAG"
 
-                PROJECT_ID="tles3bfw"
                 API_URL="https://api.modrinth.com/v2/project/$PROJECT_ID/version"
 
                 VERSION_DATA=$(curl -s -H "Authorization: $MODRINTH_TOKEN" "$API_URL")

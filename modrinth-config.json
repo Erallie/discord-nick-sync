@@ -1,0 +1,17 @@
+{
+  "project_id": "tles3bfw",
+  "dependencies": [
+    {
+      "project_id": "UmLGoGij",
+      "version": "*",
+      "dependency_type": "required"
+    },
+    {
+      "project_id": "hXiIvTyT",
+      "version": "*",
+      "dependency_type": "required"
+    }
+  ],
+  "loaders": ["spigot", "paper", "purpur"],
+  "game_versions": ["1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4"]
+}

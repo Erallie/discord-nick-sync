@@ -23,13 +23,17 @@ jobs:
                 echo "IS_PRERELEASE=$(echo "$release_info" | jq -r '.prerelease')" >> $GITHUB_ENV
                 echo "IS_LATEST=$(echo "$release_info" | jq -r '.is_latest')" >>      $GITHUB_ENV
 
+          - name: Load Modrinth config
+            run: |
+                CONFIG=$(cat modrinth-config.json)
+                PROJECT_ID=$(echo "$CONFIG" | jq -r '.project_id')
+
           - name: Find Modrinth version ID
             env:
                 MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
             run: |
                 echo "Looking for Modrinth version with tag: $RELEASE_TAG"
 
-                PROJECT_ID="tles3bfw"
                 VERSION_DATA=$(curl -s -H "Authorization: $MODRINTH_TOKEN" https://api.modrinth.com/v2/project/$PROJECT_ID/version)
                 VERSION_JSON=$(echo "$VERSION_DATA" | jq -r --arg TAG "$RELEASE_TAG" '.[] | select(.version_number == $TAG)')
 
