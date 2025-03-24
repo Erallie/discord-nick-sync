@@ -36,14 +36,6 @@ jobs:
                     "https://api.github.com/repos/${{ github.repository }}/releases/assets/$asset_id" \
                     -o "$ASSET_NAME"
 
-          - name: Show files in workspace
-            run: |
-                echo "PWD: $(pwd)"
-                echo "Files in workspace:"
-                ls -lah
-                echo "Checking for modrinth-config.json:"
-                ls -l modrinth-config.json || echo "❌ modrinth-config.json not found in $(pwd)"
-
           - name: Prepare Modrinth metadata
             run: |
                 CONFIG=$(cat modrinth-config.json)
