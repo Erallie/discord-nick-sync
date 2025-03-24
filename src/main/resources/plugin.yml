@@ -14,7 +14,7 @@ commands:
       §e- §6/discordnick §e< discord | minecraft | off >
       §e- §6/discordnick sync §e[ all | <username> ]
       §e- §6/discordnick reload
-    aliases: [dn, dnick, discnick]
+    aliases: [dn, dns, dnick, discnick]
     permission: discordnick.use
 permissions:
   discordnick.use:
