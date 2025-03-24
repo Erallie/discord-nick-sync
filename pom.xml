@@ -4,7 +4,7 @@
   <groupId>com.gozarproductions</groupId>
   <artifactId>discordnicksync</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
   <name>Discord Nick Sync</name>
   <description>Syncs your Discord nickname with your Essentials nickname via DiscordSRV</description>
   <dependencies>
