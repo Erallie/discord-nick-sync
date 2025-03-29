@@ -129,6 +129,9 @@ public class MentionListener implements Listener {
             if (input.toLowerCase().startsWith(nick.toLowerCase())) {
                 return new AbstractMap.SimpleEntry<>(player, nick);
             }
+            if (input.toLowerCase().startsWith(player.getName().toLowerCase())) {
+                return new AbstractMap.SimpleEntry<>(player, nick);
+            }
         }
         return null;
     }
