@@ -17,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.earth2me.essentials.Essentials;
 import com.gozarproductions.commands.DiscordNickCommand;
 import com.gozarproductions.commands.DiscordNickTabCompleter;
+import com.gozarproductions.listeners.MentionListener;
 import com.gozarproductions.listeners.SyncListener;
 import com.gozarproductions.managers.ConfigUpdater;
 import com.gozarproductions.managers.DataManager;
@@ -84,6 +85,8 @@ public class DiscordNickSync extends JavaPlugin {
         SyncListener syncListener = new SyncListener(this);
         getServer().getPluginManager().registerEvents(syncListener, this);
         DiscordSRV.api.subscribe(syncListener);
+        getServer().getPluginManager().registerEvents(new MentionListener(this), this);
+
     }
 
     @Override

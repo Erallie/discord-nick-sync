@@ -4,9 +4,15 @@
   <groupId>com.gozarproductions</groupId>
   <artifactId>discordnicksync</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <name>Discord Nick Sync</name>
   <description>Syncs your Discord nickname with your Essentials nickname via DiscordSRV</description>
+  <repositories>
+    <repository>
+        <id>Scarsz-Nexus</id>
+        <url>https://nexus.scarsz.me/content/groups/public/</url>
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
         <groupId>org.spigotmc</groupId>
@@ -15,7 +21,7 @@
         <scope>provided</scope>
     </dependency>
     <dependency>
-        <groupId>com.scarsz.discordsrv</groupId>
+        <groupId>com.discordsrv</groupId>
         <artifactId>discordsrv</artifactId>
         <version>1.29.0</version>
         <scope>provided</scope>
