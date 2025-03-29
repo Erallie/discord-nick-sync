@@ -45,7 +45,7 @@ public class MentionListener implements Listener {
         Matcher matcher = pattern.matcher(message);
 
         while (matcher.find()) {
-            String mention = matcher.group(); // e.g., "@Erika_Gozar"
+            String rawMention = matcher.group(); // e.g., "@Erika_Gozar"
 
             String rawMinecraftNick = matcher.group(1);
             Map.Entry<Player, String> data = getPlayerByNickname(rawMinecraftNick);
@@ -53,6 +53,7 @@ public class MentionListener implements Listener {
 
             Player player = data.getKey();
             String minecraftNick = data.getValue();
+            String mention = rawMention.substring(0, minecraftNick.length() + 1);
 
             //!TODO: add functionality for mentioning player
 
@@ -99,7 +100,7 @@ public class MentionListener implements Listener {
             } else {
                 nick = ChatColor.stripColor(nick);
             }
-            if (input.equalsIgnoreCase(nick)) {
+            if (input.toLowerCase().startsWith(nick.toLowerCase())) {
                 return new AbstractMap.SimpleEntry<>(player, nick);
             }
         }
