@@ -9,6 +9,9 @@ import github.scarsz.discordsrv.dependencies.jda.api.entities.User;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
+import org.bukkit.Registry;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -46,6 +49,17 @@ public class MentionListener implements Listener {
             chatColor = ChatColor.WHITE; // fallback if the color is invalid
         }
 
+        String soundName = config.getString("mentions.sound", "BLOCK_NOTE_BLOCK_BELL");
+        Sound sound;
+
+        try {
+            NamespacedKey namespacedKey = NamespacedKey.minecraft(soundName.toLowerCase());
+            sound = Registry.SOUNDS.get(namespacedKey);
+        } catch (Exception e) {
+            plugin.getLogger().warning("Invalid sound key: " + soundName);
+            sound = Sound.BLOCK_NOTE_BLOCK_BELL;
+        }
+
         String message = event.getMessage();
         if (!message.contains("@")) return;
         // event.setCancelled(true);
@@ -66,7 +80,10 @@ public class MentionListener implements Listener {
             String minecraftNick = data.getValue();
             String mention = rawMention.substring(0, minecraftNick.length() + 1);
 
+            //#region Alert Player
             //!TODO: add functionality for mentioning player
+            player.playSound(player.getLocation(), sound, (float) config.getDouble("mentions.sound.volume"), (float) config.getDouble("mentions.sound.pitch"));
+            //#endregion
 
             UUID uuid = player.getUniqueId();
             DiscordSRV discordSRV = DiscordSRV.getPlugin();

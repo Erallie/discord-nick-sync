@@ -18,6 +18,13 @@ replace-whitespaces-with: ""
 merge-whitespaces-before-replacing: true
 
 mentions:
+  # The sound that a player hears when they are mentioned.
+  sound:
+    # Can be any value listed here: https://minecraft.wiki/w/Sounds.json#Java_Edition_values
+    sound: "block.note_block.bell"
+    volume: 1.0
+    pitch: 1.0
+
   # The color of the mention in chat.
   # Can be any value listed here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/ChatColor.html#enum-constant-summary
   color: YELLOW
