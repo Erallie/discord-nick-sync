@@ -17,6 +17,11 @@ replace-whitespaces-with: ""
 # Whether to combine whitespace characters together before replacing them with the value above.
 merge-whitespaces-before-replacing: true
 
+mentions:
+  # The color of the mention in chat.
+  # Can be any value listed here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/ChatColor.html#enum-constant-summary
+  color: YELLOW
+
 updater:
   # Whether to notify admins for new snapshot releases. Admins will still be notified on stable releases.
   notify-on-dev-release: false

@@ -9,6 +9,7 @@ import github.scarsz.discordsrv.dependencies.jda.api.entities.User;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -35,6 +36,16 @@ public class MentionListener implements Listener {
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
+        FileConfiguration config = plugin.getConfig();
+
+        String colorString = config.getString("mentions.color", "WHITE");
+        ChatColor chatColor;
+        try {
+            chatColor = ChatColor.valueOf(colorString.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            chatColor = ChatColor.WHITE; // fallback if the color is invalid
+        }
+
         String message = event.getMessage();
         if (!message.contains("@")) return;
         // event.setCancelled(true);
@@ -83,7 +94,7 @@ public class MentionListener implements Listener {
         }
 
         for (Map.Entry<String, String> entry : mentionMap.entrySet()) {
-            message = message.replace(entry.getKey(), "§e" + entry.getValue() + "§r");
+            message = message.replace(entry.getKey(), chatColor + entry.getValue() + ChatColor.RESET);
         }
 
         event.setMessage(message); // This modifies the message DiscordSRV picks up
