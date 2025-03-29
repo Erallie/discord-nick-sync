@@ -89,5 +89,4 @@ public class DataManager {
         }
         return storedMode;
     }
-
 }
