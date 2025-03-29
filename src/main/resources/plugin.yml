@@ -10,7 +10,6 @@ commands:
   discordnick:
     description: Main command for DiscordNickSync.
     usage: |
-      §6Usage:
       §e- §6/discordnick §e< discord | minecraft | off >
       §e- §6/discordnick sync §e[ all | <username> ]
       §e- §6/discordnick reload
@@ -18,7 +17,10 @@ commands:
     permission: discordnick.use
 permissions:
   discordnick.use:
-    description: Allows players to set their own nickname sync mode.
+    description: |
+      §6Allows players to:
+      §e- Set their own nickname sync mode
+      §e- Run §6/discordnick sync §efor themselves.
     default: true
   discordnick.admin:
     description: |
