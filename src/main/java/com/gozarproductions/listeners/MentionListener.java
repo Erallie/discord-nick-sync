@@ -79,10 +79,7 @@ public class MentionListener implements Listener {
             };
             String discordNick = discordMember.getEffectiveName();
 
-
-            if (message.contains("@" + minecraftNick)) {
-                mentionMap.put(mention, "@" + discordNick);
-            }
+            mentionMap.put(mention, "@" + discordNick);
         }
 
         for (Map.Entry<String, String> entry : mentionMap.entrySet()) {
