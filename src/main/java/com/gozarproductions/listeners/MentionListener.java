@@ -67,7 +67,7 @@ public class MentionListener implements Listener {
 
         Map<String, String> mentionMap = new HashMap<>();
 
-        Pattern pattern = Pattern.compile("@(\\S+)"); // matches @ followed by word characters (letters, numbers, underscores)
+        Pattern pattern = Pattern.compile("@((?:(?! @).)+)"); // matches @ followed by word characters (letters, numbers, underscores)
         Matcher matcher = pattern.matcher(message);
 
         while (matcher.find()) {
