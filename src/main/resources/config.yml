@@ -18,6 +18,9 @@ replace-whitespaces-with: ""
 merge-whitespaces-before-replacing: true
 
 mentions:
+  # Set to false to disable mentions.
+  enabled: true
+
   # The sound that a player hears when they are mentioned.
   sound:
     # Can be any value listed here: https://minecraft.wiki/w/Sounds.json#Java_Edition_values
