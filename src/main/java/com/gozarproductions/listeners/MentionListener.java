@@ -11,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.Registry;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -82,7 +83,7 @@ public class MentionListener implements Listener {
 
             //#region Alert Player
             //!TODO: add functionality for mentioning player
-            player.playSound(player.getLocation(), sound, (float) config.getDouble("mentions.sound.volume"), (float) config.getDouble("mentions.sound.pitch"));
+            player.playSound(player.getLocation(), sound, SoundCategory.MASTER, (float) config.getDouble("mentions.sound.volume"), (float) config.getDouble("mentions.sound.pitch"));
             //#endregion
 
             UUID uuid = player.getUniqueId();
