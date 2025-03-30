@@ -85,8 +85,8 @@ public class DiscordNickCommand implements CommandExecutor {
         UUID playerUUID = player.getUniqueId();
 
         String usage = command.getUsage()
-            .replace("§e", languageManager.getCachedColors().get("d"))
-            .replace("§6", languageManager.getCachedColors().get("h"));
+            .replace("§e", languageManager.getCachedColor("d"))
+            .replace("§6", languageManager.getCachedColor("h"));
 
         SyncMode mode = SyncMode.fromString(subCommand.toUpperCase());
 

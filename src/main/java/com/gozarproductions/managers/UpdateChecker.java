@@ -109,8 +109,8 @@ public class UpdateChecker {
 
     private void notify(Player player) {
         LanguageManager languageManager = plugin.getLanguageManager();
-        String defaultColor = languageManager.getCachedColors().get("d");
-        String highlight = languageManager.getCachedColors().get("h");
+        String defaultColor = languageManager.getCachedColor("d");
+        String highlight = languageManager.getCachedColor("h");
         
         player.sendMessage(
             highlight + "[" + ChatColor.BOLD + "DiscordNickSync" + highlight + "] " + defaultColor + "A new update is available: " + highlight + latestVersion +

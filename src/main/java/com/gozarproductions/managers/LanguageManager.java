@@ -16,8 +16,9 @@ public class LanguageManager {
     private FileConfiguration languageConfig;
     private final Map<String, String> cachedColors = new HashMap<>();
 
-    public Map<String, String> getCachedColors() {
-        return cachedColors;
+    public String getCachedColor(String key) {
+        String color = cachedColors.get(key);
+        return ChatColor.translateAlternateColorCodes('7', color);
     }
 
     public LanguageManager(DiscordNickSync plugin) {
@@ -38,10 +39,10 @@ public class LanguageManager {
         languageConfig = YamlConfiguration.loadConfiguration(languageFile);
 
         cachedColors.clear();
-        cachedColors.put("d", getColor("default", false));
-        cachedColors.put("h", getColor("highlight", false));
-        cachedColors.put("e", getColor("error", false));
-        cachedColors.put("eh", getColor("error_highlight", false));
+        cachedColors.put("d", getColor("default"));
+        cachedColors.put("h", getColor("highlight"));
+        cachedColors.put("e", getColor("error"));
+        cachedColors.put("eh", getColor("error_highlight"));
     }
 
     /**
@@ -54,12 +55,8 @@ public class LanguageManager {
     /**
      * Retrieves a color from the language config.
      */
-    public String getColor(String key, boolean convertColors) {
-        String color = languageConfig.getString("colors." + key, "");
-        if (convertColors) {
-            return ChatColor.translateAlternateColorCodes('&', color);
-        }
-        return color;
+    public String getColor(String key) {
+        return languageConfig.getString("colors." + key, "");
     }
 
     /**
