@@ -126,11 +126,15 @@ public class MentionListener implements Listener {
             } else {
                 nick = ChatColor.stripColor(nick);
             }
-            if (input.toLowerCase().startsWith(nick.toLowerCase())) {
+            String lowerCaseInput = input.toLowerCase();
+            if (lowerCaseInput.startsWith(nick.toLowerCase())) {
                 return new AbstractMap.SimpleEntry<>(player, nick);
             }
-            if (input.toLowerCase().startsWith(player.getName().toLowerCase())) {
+            nick = player.getName();
+            if (lowerCaseInput.startsWith(nick.toLowerCase())) {
                 return new AbstractMap.SimpleEntry<>(player, nick);
+            } else {
+                plugin.getLogger().info(lowerCaseInput + " " + player.getName().toLowerCase() + " " + nick);
             }
         }
         return null;
