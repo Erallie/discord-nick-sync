@@ -44,6 +44,7 @@ public class MentionListener implements Listener {
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         FileConfiguration config = plugin.getConfig();
 
+        //#region Color config
         String colorString = config.getString("mentions.color", "WHITE");
         ChatColor chatColor;
         try {
@@ -51,6 +52,9 @@ public class MentionListener implements Listener {
         } catch (IllegalArgumentException e) {
             chatColor = ChatColor.WHITE; // fallback if the color is invalid
         }
+        //#endregion
+
+        //#region Sound config
         boolean sendSound = config.getBoolean("mentions.play-sound.enabled", true);
         String soundName = null;
         Sound sound = null;
@@ -70,6 +74,7 @@ public class MentionListener implements Listener {
             volume = (float) config.getDouble("mentions.play-sound.volume", 1.0f);
             pitch = (float) config.getDouble("mentions.play-sound.pitch", 1.0f);
         }
+        //#endregion
 
         String message = event.getMessage();
         if (!message.contains("@")) return;
