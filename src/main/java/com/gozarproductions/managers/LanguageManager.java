@@ -7,11 +7,14 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import com.gozarproductions.DiscordNickSync;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LanguageManager {
     private final DiscordNickSync plugin;
     private File languageFile;
     private FileConfiguration languageConfig;
+    private final Map<String, String> cachedColors = new HashMap<>();
 
     public LanguageManager(DiscordNickSync plugin) {
         this.plugin = plugin;
@@ -29,6 +32,12 @@ public class LanguageManager {
         }
 
         languageConfig = YamlConfiguration.loadConfiguration(languageFile);
+
+        cachedColors.clear();
+        cachedColors.put("d", getColor("default", false));
+        cachedColors.put("h", getColor("highlight", false));
+        cachedColors.put("e", getColor("error", false));
+        cachedColors.put("eh", getColor("error_highlight", false));
     }
 
     /**
@@ -56,11 +65,10 @@ public class LanguageManager {
         String message = languageConfig.getString(key, key);
 
         // Apply color codes
-        message = message
-            .replace("{d}", getColor("default", false))
-            .replace("{h}", getColor("highlight", false))
-            .replace("{e}", getColor("error", false))
-            .replace("{eh}", getColor("error_highlight", false));
+        for (Map.Entry<String, String> entry : cachedColors.entrySet()) {
+            message = message.replace("{" + entry.getKey() + "}", entry.getValue());
+        }
+
 
         // Apply placeholders
         for (int i = 0; i < replacements.length; i += 2) {
