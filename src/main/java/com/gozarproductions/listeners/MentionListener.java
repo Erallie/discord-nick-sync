@@ -21,12 +21,15 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.AbstractMap;
-import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MentionListener implements Listener {
 
@@ -165,42 +168,43 @@ public class MentionListener implements Listener {
     }
 
     public Map.Entry<OfflinePlayer, String> getPlayerByNickname(String input) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            String nick = essentials.getUser(player).getNickname();
-            if (nick == null || nick.isEmpty()) {
-                nick = player.getDisplayName();
-            } else {
-                nick = ChatColor.stripColor(nick);
-            }
-            String lowerCaseInput = input.toLowerCase();
+        List<Map.Entry<OfflinePlayer, String>> mentionables = Stream.concat(
+            DiscordSRV.getPlugin().getAccountLinkManager().getLinkedAccounts().values().stream()
+                .map(Bukkit::getOfflinePlayer),
+            Bukkit.getOnlinePlayers().stream()
+                .map(p -> (OfflinePlayer) p)
+        )
+        .distinct()
+        .map(player -> new AbstractMap.SimpleEntry<>(player, getStrippedNickname(player)))
+        .sorted(Comparator.comparingInt((Map.Entry<OfflinePlayer, String> e) -> e.getValue().length()).reversed())
+        .collect(Collectors.toList());
+
+        
+        String lowerCaseInput = input.toLowerCase();
+
+        for (Map.Entry<OfflinePlayer, String> entry : mentionables) {
+            String nick = entry.getValue();
+            OfflinePlayer player = entry.getKey();
             if (lowerCaseInput.startsWith(nick.toLowerCase())) {
-                return new AbstractMap.SimpleEntry<>(player, nick);
+                return entry;
             }
             nick = player.getName();
             if (lowerCaseInput.startsWith(nick.toLowerCase())) {
-                return new AbstractMap.SimpleEntry<>(player, nick);
+                return entry;
             }
         }
-        Collection<UUID> linkedUUIDs = DiscordSRV.getPlugin().getAccountLinkManager().getLinkedAccounts().values();
-        for (UUID uuid : linkedUUIDs) {
-            String nick = essentials.getUser(uuid).getNickname();
 
-            OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-            if (nick == null || nick.isEmpty()) {
-                nick = player.getName();
-            } else {
-                nick = ChatColor.stripColor(nick);
-            }
-
-            String lowerCaseInput = input.toLowerCase();
-            if (lowerCaseInput.startsWith(nick.toLowerCase())) {
-                return new AbstractMap.SimpleEntry<>(player, nick);
-            }
-            nick = player.getName();
-            if (lowerCaseInput.startsWith(nick.toLowerCase())) {
-                return new AbstractMap.SimpleEntry<>(player, nick);
-            }
-        }
         return null;
+    }
+
+    private String getStrippedNickname(OfflinePlayer player) {
+        if (player.isOnline()) {
+            Player online = (Player) player;
+            String nick = essentials.getUser(online).getNickname();
+            return nick != null ? ChatColor.stripColor(nick) : online.getDisplayName();
+        } else {
+            String nick = essentials.getUser(player.getUniqueId()).getNickname();
+            return nick != null ? ChatColor.stripColor(nick) : player.getName();
+        }
     }
 }
