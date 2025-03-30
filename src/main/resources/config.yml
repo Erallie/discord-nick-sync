@@ -25,7 +25,9 @@ mentions:
   sound:
     # Can be any value listed here: https://minecraft.wiki/w/Sounds.json#Java_Edition_values
     sound: "block.note_block.bell"
+    # Any number between 0 and 1.
     volume: 1.0
+    # Any number between 0 and 2.
     pitch: 1.0
 
   # The color of the mention in chat.
