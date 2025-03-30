@@ -14,6 +14,12 @@ DiscordNickSync currently *only* syncs nicknames when a player does any of the f
 
 There is currently *no* timer to sync nicknames from Discord to Minecraft. If this is a feature you would want, [create an issue](https://github.com/Erallie/discord-nick-sync/issues), and I will consider adding it.
 
+## Mentions
+DiscordNickSync also allows syncing of Discord mentions!
+- Type `@<nickname>` in minecraft chat to also ping the linked account on Discord.
+- Mentions from Discord also ping online players in Minecraft.
+- Optionally configure a sound and a title message for the mentioned player.
+
 # Default Files
 ## Config.yml
 ```yml
@@ -35,6 +41,44 @@ replace-whitespaces-with: ""
 
 # Whether to combine whitespace characters together before replacing them with the value above.
 merge-whitespaces-before-replacing: true
+
+# Type @<minecraft username|essentials nickname|discord nickname> in minecraft chat to also ping the linked account on Discord.
+# Mentions also work when pinged on Discord, except for the mention color.
+mentions:
+  # Set to false to disable mentions.
+  enabled: true
+
+  # The sound that a player hears when they are mentioned.
+  # You must manually disable MinecraftMentionSound in DiscordSRV's config.yml if you don't want multiple sounds.
+  play-sound:
+    enabled: true
+    # Can be any value listed under "Java Edition values" on this webpage: https://minecraft.wiki/w/Sounds.json#Sound_events
+    sound: "block.note_block.bell"
+    # Any decimal number between 0 and 1.
+    volume: 1.0
+    # Any decimal number between 0 and 2.
+    pitch: 1.0
+  
+  # Display a title to the player who is mentioned.
+  send-title:
+    enabled: true
+    # Type {mentioner} for the nickname of the person who mentioned you
+    # Color formats are supported
+    title: "&eYou have been mentioned"
+    # Type {mentioner} for the nickname of the person who mentioned you
+    # Color formats are supported
+    subtitle: "&eby &6&l{mentioner}"
+    duration:
+      # The duration in ticks for the title to fade in.
+      fade-in: 5
+      # The duration in ticks for the title to stay on the screen.
+      stay: 70
+      # The duration in ticks for the title to fade out.
+      fade-out: 5
+
+  # The color of the mention in chat.
+  # Set to "" to disable
+  color: "&e"
 
 updater:
   # Whether to notify admins for new snapshot releases. Admins will still be notified on stable releases.
@@ -100,7 +144,9 @@ errors:
 
 # Permissions
 - `discordnick.use`
-    - Allows players to use `/discordnick`.
+    - Allows players to:
+        - Set their own nickname sync mode
+        - Run `/discordnick sync` for themselves.
     - Default: `true`
 - `discordnick.admin`
     - Allows admins to:
