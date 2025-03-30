@@ -121,7 +121,6 @@ public class MentionListener implements Listener {
             String mention = rawMention.substring(0, minecraftNick.length() + 1);
 
             //#region Alert Player
-            //!TODO: add functionality for mentioning player
             if (player != null) {
                 if (sendSound) {
                     player.playSound(player.getLocation(), sound, SoundCategory.MASTER, volume, pitch);
