@@ -20,6 +20,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.AbstractMap;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -135,7 +136,8 @@ public class MentionListener implements Listener {
                 return new AbstractMap.SimpleEntry<>(player, nick);
             }
         }
-        for (UUID uuid : plugin.getDataManager().getAllSyncedPlayers()) {
+        Collection<UUID> linkedUUIDs = DiscordSRV.getPlugin().getAccountLinkManager().getLinkedAccounts().values();
+        for (UUID uuid : linkedUUIDs) {
             String nick = essentials.getUser(uuid).getNickname();
 
             Player player = Bukkit.getPlayer(uuid);
