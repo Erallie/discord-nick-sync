@@ -3,8 +3,8 @@ package com.gozarproductions.listeners;
 import com.earth2me.essentials.Essentials;
 import com.gozarproductions.DiscordNickSync;
 import github.scarsz.discordsrv.DiscordSRV;
-import github.scarsz.discordsrv.dependencies.jda.api.JDA;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
+import github.scarsz.discordsrv.dependencies.jda.api.entities.Message;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.User;
 import github.scarsz.discordsrv.api.Subscribe;
 import github.scarsz.discordsrv.api.events.DiscordGuildMessagePreProcessEvent;
@@ -25,11 +25,13 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import java.util.AbstractMap;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MentionListener implements Listener {
@@ -48,18 +50,26 @@ public class MentionListener implements Listener {
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         String message = event.getMessage();
         String mentionerName = getStrippedNickname(event.getPlayer());
-        event.setMessage(processMentions(message, mentionerName));
+        event.setMessage(processMentions(message, mentionerName, null));
     }
     
     @Subscribe
     public void onDiscordMessage(DiscordGuildMessagePreProcessEvent event) {
-        String message = event.getMessage().getContentDisplay();
+        Message message = event.getMessage();
+        String messageString = message.getContentDisplay();
         String mentionerName = event.getMember().getEffectiveName();
-        String updatedMessage = processMentions(message, mentionerName);
+        List<Player> players = message.getMentionedUsers().stream().map(user -> {
+                UUID minecraftUuid = DiscordSRV.getPlugin().getAccountLinkManager().getUuid(user.getId());
+                return Bukkit.getPlayer(minecraftUuid);
+            })
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+        processMentions(messageString, mentionerName, players);
+        // String updatedMessage = processMentions(messageString, mentionerName, players);
         // !TODO: Actually set updatedMessage into outgoing chat if/when you move to DiscordSRVMessagePreSendEvent
     }
 
-    private String processMentions(String message, String mentionerName) {
+    private String processMentions(String message, String mentionerName, List<Player> players) {
         if (!message.contains("@")) return message;
 
         //#region Color config
@@ -105,6 +115,18 @@ public class MentionListener implements Listener {
             fadeOut = config.getInt("mentions.send-title.duration.fade-out", 5);
         }
         //#endregion
+
+        if (players != null) {
+            for (Player player : players) {
+                if (sendSound) {
+                    player.playSound(player.getLocation(), sound, SoundCategory.MASTER, volume, pitch);
+                }
+                if (sendTitle && title != null && subtitle != null) {
+                    player.sendTitle(title, subtitle, fadeIn, stay, fadeOut);
+                }
+            }
+            return message;
+        }
 
         Map<String, String> replacements = new HashMap<>();
         Matcher matcher = Pattern.compile("@((?:(?! @).)+)").matcher(message);
