@@ -47,7 +47,7 @@ mentions:
       # The duration in ticks for the title to fade in.
       fade-in: 5
       # The duration in ticks for the title to stay on the screen.
-      stay: 60
+      stay: 70
       # The duration in ticks for the title to fade out.
       fade-out: 5
 
