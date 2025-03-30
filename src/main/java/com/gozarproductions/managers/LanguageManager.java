@@ -18,7 +18,7 @@ public class LanguageManager {
 
     public String getCachedColor(String key) {
         String color = cachedColors.get(key);
-        return ChatColor.translateAlternateColorCodes('7', color);
+        return ChatColor.translateAlternateColorCodes('&', color);
     }
 
     public LanguageManager(DiscordNickSync plugin) {
