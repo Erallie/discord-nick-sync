@@ -35,10 +35,10 @@ mentions:
     enabled: true
     # Type {mentioner} for the nickname of the person who mentioned you
     # Color formats are supported
-    title: "You have been mentioned"
+    title: "&eYou have been mentioned"
     # Type {mentioner} for the nickname of the person who mentioned you
     # Color formats are supported
-    subtitle: "by {mentioner}"
+    subtitle: "&eby &6&l{mentioner}"
     duration:
       # The duration in ticks for the title to fade in.
       fade-in: 5
