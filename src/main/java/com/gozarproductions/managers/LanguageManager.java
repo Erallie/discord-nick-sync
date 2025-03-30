@@ -55,7 +55,7 @@ public class LanguageManager {
     /**
      * Retrieves a color from the language config.
      */
-    public String getColor(String key) {
+    private String getColor(String key) {
         return languageConfig.getString("colors." + key, "");
     }
 
