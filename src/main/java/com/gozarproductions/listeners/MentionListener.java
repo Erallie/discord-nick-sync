@@ -6,6 +6,8 @@ import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.JDA;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Member;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.User;
+import github.scarsz.discordsrv.api.Subscribe;
+import github.scarsz.discordsrv.api.events.DiscordGuildMessagePreProcessEvent;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -44,35 +46,43 @@ public class MentionListener implements Listener {
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
-        FileConfiguration config = plugin.getConfig();
+        String message = event.getMessage();
+        String mentionerName = getStrippedNickname(event.getPlayer());
+        event.setMessage(processMentions(message, mentionerName));
+    }
+    
+    @Subscribe
+    public void onDiscordMessage(DiscordGuildMessagePreProcessEvent event) {
+        String message = event.getMessage().getContentDisplay();
+        String mentionerName = event.getMember().getEffectiveName();
+        String updatedMessage = processMentions(message, mentionerName);
+        // !TODO: Actually set updatedMessage into outgoing chat if/when you move to DiscordSRVMessagePreSendEvent
+    }
+
+    private String processMentions(String message, String mentionerName) {
+        if (!message.contains("@")) return message;
 
         //#region Color config
-        String colorString = config.getString("mentions.color", "WHITE");
+        FileConfiguration config = plugin.getConfig();
         ChatColor chatColor;
         try {
-            chatColor = ChatColor.valueOf(colorString.toUpperCase());
+            chatColor = ChatColor.valueOf(config.getString("mentions.color", "WHITE").toUpperCase());
         } catch (IllegalArgumentException e) {
-            chatColor = ChatColor.WHITE; // fallback if the color is invalid
+            chatColor = ChatColor.WHITE;
         }
         //#endregion
 
         //#region Sound config
         boolean sendSound = config.getBoolean("mentions.play-sound.enabled", true);
-        String soundName = null;
-        Sound sound = null;
-        float volume = 1.0f;
-        float pitch = 1.0f;
+        Sound sound = Sound.BLOCK_NOTE_BLOCK_BELL;
+        float volume = 1.0f, pitch = 1.0f;
         if (sendSound) {
-            soundName = config.getString("mentions.play-sound.sound", "block.note_block.bell");
-
             try {
-                NamespacedKey namespacedKey = NamespacedKey.minecraft(soundName.toLowerCase());
-                sound = Registry.SOUNDS.get(namespacedKey);
+                String soundName = config.getString("mentions.play-sound.sound", "block.note_block.bell");
+                sound = Registry.SOUNDS.get(NamespacedKey.minecraft(soundName.toLowerCase()));
             } catch (Exception e) {
-                plugin.getLogger().warning("Invalid sound key: " + soundName);
-                sound = Sound.BLOCK_NOTE_BLOCK_BELL;
+                plugin.getLogger().warning("Invalid sound key.");
             }
-
             volume = (float) config.getDouble("mentions.play-sound.volume", 1.0f);
             pitch = (float) config.getDouble("mentions.play-sound.pitch", 1.0f);
         }
@@ -80,90 +90,68 @@ public class MentionListener implements Listener {
 
         //#region Title config
         boolean sendTitle = config.getBoolean("mentions.send-title.enabled", true);
-        String title = null;
-        String subtitle = null;
+        String title = null, subtitle = null;
+        int fadeIn = 5, stay = 60, fadeOut = 5;
 
-        int fadeIn = 0;
-        int stay = 0;
-        int fadeOut = 0;
-
-        if (sendTitle) {
-            Player mentioner = event.getPlayer();
-            String mentionerName = essentials.getUser(mentioner).getNickname();
-            if (mentionerName == null || mentionerName.isEmpty()) {
-                mentionerName = mentioner.getDisplayName();
-            }
-            title = ChatColor.translateAlternateColorCodes('&', config.getString("mentions.send-title.title", "You have been mentioned").replaceAll("\\{mentioner\\}", mentionerName));
-            subtitle = ChatColor.translateAlternateColorCodes('&', config.getString("mentions.send-title.subtitle", "by {mentioner}").replaceAll("\\{mentioner\\}", mentionerName));
+        if (sendTitle && mentionerName != null) {
+            title = ChatColor.translateAlternateColorCodes('&',
+                config.getString("mentions.send-title.title", "&eYou have been mentioned")
+                    .replace("{mentioner}", mentionerName));
+            subtitle = ChatColor.translateAlternateColorCodes('&',
+                config.getString("mentions.send-title.subtitle", "&eby &6&l{mentioner}")
+                    .replace("{mentioner}", mentionerName));
             fadeIn = config.getInt("mentions.send-title.duration.fade-in", 5);
             stay = config.getInt("mentions.send-title.duration.stay", 60);
             fadeOut = config.getInt("mentions.send-title.duration.fade-out", 5);
         }
         //#endregion
 
-        String message = event.getMessage();
-        if (!message.contains("@")) return;
-        // event.setCancelled(true);
-
-        Map<String, String> mentionMap = new HashMap<>();
-
-        Pattern pattern = Pattern.compile("@((?:(?! @).)+)"); // matches @ followed by word characters (letters, numbers, underscores)
-        Matcher matcher = pattern.matcher(message);
+        Map<String, String> replacements = new HashMap<>();
+        Matcher matcher = Pattern.compile("@((?:(?! @).)+)").matcher(message);
 
         while (matcher.find()) {
-            String rawMention = matcher.group(); // e.g., "@Erika_Gozar"
+            String rawMention = matcher.group();     // e.g. "@Erika"
+            String mentionedName = matcher.group(1); // e.g. "Erika"
 
-            String rawMinecraftNick = matcher.group(1);
-            Map.Entry<OfflinePlayer, String> data = getPlayerByNickname(rawMinecraftNick);
-            if (data == null) continue;
+            Map.Entry<OfflinePlayer, String> playerEntry = getPlayerByNickname(mentionedName);
+            if (playerEntry == null) continue;
 
-            OfflinePlayer offlinePlayer = data.getKey();
-            Player player = offlinePlayer.isOnline() ? Bukkit.getPlayer(offlinePlayer.getUniqueId()) : null;
-            String minecraftNick = data.getValue();
-            String mention = rawMention.substring(0, minecraftNick.length() + 1);
+            Player player = Bukkit.getPlayer(playerEntry.getKey().getUniqueId());
+            UUID uuid = playerEntry.getKey().getUniqueId();
+            String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(uuid);
 
-            //#region Alert Player
-            if (player != null) {
+            String replacementName = playerEntry.getValue(); // default: Minecraft nickname
+
+            if (discordId != null) {
+                User user = DiscordSRV.getPlugin().getJda().getUserById(discordId);
+                if (user != null) {
+                    Member member = DiscordSRV.getPlugin().getMainGuild().getMember(user);
+                    if (member != null && member.getEffectiveName() != null) {
+                        replacementName = member.getEffectiveName(); // override with Discord name
+                    }
+                }
+            }
+
+            String replacement = chatColor + "@" + replacementName + ChatColor.RESET;
+
+            replacements.put(rawMention, replacement);
+
+            // Alert
+            if (player != null && player.isOnline()) {
                 if (sendSound) {
                     player.playSound(player.getLocation(), sound, SoundCategory.MASTER, volume, pitch);
                 }
-
-                if (sendTitle) {
+                if (sendTitle && title != null && subtitle != null) {
                     player.sendTitle(title, subtitle, fadeIn, stay, fadeOut);
                 }
             }
-            //#endregion
-
-            UUID uuid = offlinePlayer.getUniqueId();
-            DiscordSRV discordSRV = DiscordSRV.getPlugin();
-            JDA jda = discordSRV.getJda();
-            String discordId = discordSRV.getAccountLinkManager().getDiscordId(uuid);
-            if (discordId == null) {
-                mentionMap.put(mention, "@" + minecraftNick);
-                continue;
-            };
-            
-            User discordUser = jda.getUserById(discordId);
-            if (discordUser == null) {
-                mentionMap.put(mention, "@" + minecraftNick);
-                continue;
-            };
-            
-            Member discordMember = discordSRV.getMainGuild().getMember(discordUser);
-            if (discordMember == null) {
-                mentionMap.put(mention, "@" + minecraftNick);
-                continue;
-            };
-            String discordNick = discordMember.getEffectiveName();
-
-            mentionMap.put(mention, "@" + discordNick);
         }
 
-        for (Map.Entry<String, String> entry : mentionMap.entrySet()) {
-            message = message.replace(entry.getKey(), chatColor + entry.getValue() + ChatColor.RESET);
+        for (Map.Entry<String, String> entry : replacements.entrySet()) {
+            message = message.replace(entry.getKey(), entry.getValue());
         }
 
-        event.setMessage(message); // This modifies the message DiscordSRV picks up
+        return message;
     }
 
     public Map.Entry<OfflinePlayer, String> getPlayerByNickname(String input) {
@@ -179,10 +167,27 @@ public class MentionListener implements Listener {
             .map(player -> {
                 String name = player.getName();
                 String nickname = getStrippedNickname(player);
+
+                // Try Minecraft name or Essentials nickname
                 if (nickname != null && lowerCaseInput.startsWith(nickname.toLowerCase())) {
                     return new AbstractMap.SimpleEntry<>(player, nickname);
                 } else if (name != null && lowerCaseInput.startsWith(name.toLowerCase())) {
                     return new AbstractMap.SimpleEntry<>(player, name);
+                }
+
+                // Try Discord nickname if linked
+                String discordId = DiscordSRV.getPlugin().getAccountLinkManager().getDiscordId(player.getUniqueId());
+                if (discordId != null) {
+                    User user = DiscordSRV.getPlugin().getJda().getUserById(discordId);
+                    if (user != null) {
+                        Member member = DiscordSRV.getPlugin().getMainGuild().getMember(user);
+                        if (member != null) {
+                            String discordNick = member.getEffectiveName();
+                            if (discordNick != null && lowerCaseInput.startsWith(discordNick.toLowerCase())) {
+                                return new AbstractMap.SimpleEntry<>(player, discordNick);
+                            }
+                        }
+                    }
                 }
                 return null;
             })
@@ -191,6 +196,7 @@ public class MentionListener implements Listener {
             .findFirst()
             .orElse(null);
     }
+
     private String getStrippedNickname(OfflinePlayer player) {
         if (player.isOnline()) {
             Player online = (Player) player;

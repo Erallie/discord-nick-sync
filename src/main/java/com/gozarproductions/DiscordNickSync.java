@@ -12,6 +12,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.earth2me.essentials.Essentials;
@@ -33,6 +34,7 @@ public class DiscordNickSync extends JavaPlugin {
     private DataManager dataManager;
     private UpdateChecker updateChecker;
     private LanguageManager languageManager;
+    private MentionListener mentionListener = null;
 
     public DataManager getDataManager() {
         return dataManager;
@@ -85,7 +87,7 @@ public class DiscordNickSync extends JavaPlugin {
         SyncListener syncListener = new SyncListener(this);
         getServer().getPluginManager().registerEvents(syncListener, this);
         DiscordSRV.api.subscribe(syncListener);
-        getServer().getPluginManager().registerEvents(new MentionListener(this), this);
+        registerMentionListener();
 
     }
 
@@ -291,10 +293,23 @@ public class DiscordNickSync extends JavaPlugin {
         }
     }
 
+    private void registerMentionListener() {
+        if (getConfig().getBoolean("mentions.enabled", true) && mentionListener == null) {
+            mentionListener = new MentionListener(this);
+            getServer().getPluginManager().registerEvents(mentionListener, this);
+            DiscordSRV.api.subscribe(mentionListener);
+        } else if (mentionListener != null) {
+            HandlerList.unregisterAll(mentionListener);
+            DiscordSRV.api.unsubscribe(mentionListener);
+            mentionListener = null;
+        }
+    }
+
     public void reloadPluginConfig() {
         reloadConfig(); // Reload config.yml from disk
         languageManager.loadLanguageFile();
         dataManager.loadData(); // Reload data.json if needed
+        registerMentionListener();
         getLogger().info("Configuration reloaded.");
         // Run the Update Checker using GitHub API
         updateChecker.checkForUpdates();
