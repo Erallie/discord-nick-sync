@@ -20,6 +20,8 @@ DiscordNickSync also allows syncing of Discord mentions!
 - Mentions from Discord also ping online players in Minecraft.
 - Optionally configure a sound and a title message for the mentioned player.
 
+Note that the way I've set it up, it changes the message in Minecraft to use Discord's nickname. I do not currently know a way around this and would like to change this. If you know another way to implement it, please let me know on our Discord!
+
 # Default Files
 ## Config.yml
 ```yml
