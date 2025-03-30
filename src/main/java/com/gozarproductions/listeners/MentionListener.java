@@ -76,19 +76,22 @@ public class MentionListener implements Listener {
             String rawMention = matcher.group(); // e.g., "@Erika_Gozar"
 
             String rawMinecraftNick = matcher.group(1);
-            Map.Entry<Player, String> data = getPlayerByNickname(rawMinecraftNick);
+            Map.Entry<OfflinePlayer, String> data = getPlayerByNickname(rawMinecraftNick);
             if (data == null) continue;
 
-            Player player = data.getKey();
+            OfflinePlayer offlinePlayer = data.getKey();
+            Player player = offlinePlayer.isOnline() ? Bukkit.getPlayer(offlinePlayer.getUniqueId()) : null;
             String minecraftNick = data.getValue();
             String mention = rawMention.substring(0, minecraftNick.length() + 1);
 
             //#region Alert Player
             //!TODO: add functionality for mentioning player
-            player.playSound(player.getLocation(), sound, SoundCategory.MASTER, (float) config.getDouble("mentions.sound.volume"), (float) config.getDouble("mentions.sound.pitch"));
+            if (player != null) {
+                player.playSound(player.getLocation(), sound, SoundCategory.MASTER, (float) config.getDouble("mentions.sound.volume"), (float) config.getDouble("mentions.sound.pitch"));
+            }
             //#endregion
 
-            UUID uuid = player.getUniqueId();
+            UUID uuid = offlinePlayer.getUniqueId();
             DiscordSRV discordSRV = DiscordSRV.getPlugin();
             JDA jda = discordSRV.getJda();
             String discordId = discordSRV.getAccountLinkManager().getDiscordId(uuid);
@@ -120,7 +123,7 @@ public class MentionListener implements Listener {
         event.setMessage(message); // This modifies the message DiscordSRV picks up
     }
 
-    public Map.Entry<Player, String> getPlayerByNickname(String input) {
+    public Map.Entry<OfflinePlayer, String> getPlayerByNickname(String input) {
         for (Player player : Bukkit.getOnlinePlayers()) {
             String nick = essentials.getUser(player).getNickname();
             if (nick == null || nick.isEmpty()) {
@@ -141,10 +144,9 @@ public class MentionListener implements Listener {
         for (UUID uuid : linkedUUIDs) {
             String nick = essentials.getUser(uuid).getNickname();
 
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-            Player player = (Player) offlinePlayer;
+            OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
             if (nick == null || nick.isEmpty()) {
-                nick = player.getDisplayName();
+                nick = player.getName();
             } else {
                 nick = ChatColor.stripColor(nick);
             }
