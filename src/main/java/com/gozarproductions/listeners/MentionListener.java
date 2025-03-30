@@ -175,18 +175,21 @@ public class MentionListener implements Listener {
                     .map(p -> (OfflinePlayer) p)
             )
             .distinct()
-            .map(player -> new AbstractMap.SimpleEntry<>(player, getStrippedNickname(player)))
-            .sorted(Comparator.comparingInt((Map.Entry<OfflinePlayer, String> e) -> e.getValue().length()).reversed())
-            .filter(entry -> {
-                String nick = entry.getValue();
-                String name = entry.getKey().getName();
-                return (nick != null && lowerCaseInput.startsWith(nick.toLowerCase())) ||
-                    (name != null && lowerCaseInput.startsWith(name.toLowerCase()));
+            .map(player -> {
+                String name = player.getName();
+                String nickname = getStrippedNickname(player);
+                if (nickname != null && lowerCaseInput.startsWith(nickname.toLowerCase())) {
+                    return new AbstractMap.SimpleEntry<>(player, nickname);
+                } else if (name != null && lowerCaseInput.startsWith(name.toLowerCase())) {
+                    return new AbstractMap.SimpleEntry<>(player, name);
+                }
+                return null;
             })
+            .filter(entry -> entry.getValue() != null)
+            .sorted(Comparator.comparingInt((Map.Entry<OfflinePlayer, String> e) -> e.getValue().length()).reversed())
             .findFirst()
             .orElse(null);
     }
-
     private String getStrippedNickname(OfflinePlayer player) {
         if (player.isOnline()) {
             Player online = (Player) player;
