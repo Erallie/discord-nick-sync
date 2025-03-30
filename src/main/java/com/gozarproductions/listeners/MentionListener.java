@@ -10,6 +10,7 @@ import github.scarsz.discordsrv.dependencies.jda.api.entities.User;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.Registry;
@@ -140,7 +141,8 @@ public class MentionListener implements Listener {
         for (UUID uuid : linkedUUIDs) {
             String nick = essentials.getUser(uuid).getNickname();
 
-            Player player = Bukkit.getPlayer(uuid);
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+            Player player = (Player) offlinePlayer;
             if (nick == null || nick.isEmpty()) {
                 nick = player.getDisplayName();
             } else {
