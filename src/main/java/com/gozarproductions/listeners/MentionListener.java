@@ -137,6 +137,8 @@ public class MentionListener implements Listener {
 
             Map.Entry<OfflinePlayer, String> playerEntry = getPlayerByNickname(mentionedName);
             if (playerEntry == null) continue;
+            String nick = playerEntry.getValue();
+            String mention = rawMention.substring(0, nick.length() + 1);
 
             Player player = Bukkit.getPlayer(playerEntry.getKey().getUniqueId());
             UUID uuid = playerEntry.getKey().getUniqueId();
@@ -156,7 +158,7 @@ public class MentionListener implements Listener {
 
             String replacement = chatColor + "@" + replacementName + ChatColor.RESET;
 
-            replacements.put(rawMention, replacement);
+            replacements.put(mention, replacement);
 
             // Alert
             if (player != null && player.isOnline()) {
