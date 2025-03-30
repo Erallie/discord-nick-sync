@@ -168,33 +168,25 @@ public class MentionListener implements Listener {
     }
 
     public Map.Entry<OfflinePlayer, String> getPlayerByNickname(String input) {
-        List<Map.Entry<OfflinePlayer, String>> mentionables = Stream.concat(
-            DiscordSRV.getPlugin().getAccountLinkManager().getLinkedAccounts().values().stream()
-                .map(Bukkit::getOfflinePlayer),
-            Bukkit.getOnlinePlayers().stream()
-                .map(p -> (OfflinePlayer) p)
-        )
-        .distinct()
-        .map(player -> new AbstractMap.SimpleEntry<>(player, getStrippedNickname(player)))
-        .sorted(Comparator.comparingInt((Map.Entry<OfflinePlayer, String> e) -> e.getValue().length()).reversed())
-        .collect(Collectors.toList());
-
-        
         String lowerCaseInput = input.toLowerCase();
 
-        for (Map.Entry<OfflinePlayer, String> entry : mentionables) {
-            String nick = entry.getValue();
-            OfflinePlayer player = entry.getKey();
-            if (lowerCaseInput.startsWith(nick.toLowerCase())) {
-                return entry;
-            }
-            nick = player.getName();
-            if (lowerCaseInput.startsWith(nick.toLowerCase())) {
-                return entry;
-            }
-        }
-
-        return null;
+        return Stream.concat(
+                DiscordSRV.getPlugin().getAccountLinkManager().getLinkedAccounts().values().stream()
+                    .map(Bukkit::getOfflinePlayer),
+                Bukkit.getOnlinePlayers().stream()
+                    .map(p -> (OfflinePlayer) p)
+            )
+            .distinct()
+            .map(player -> new AbstractMap.SimpleEntry<>(player, getStrippedNickname(player)))
+            .sorted(Comparator.comparingInt((Map.Entry<OfflinePlayer, String> e) -> e.getValue().length()).reversed())
+            .filter(entry -> {
+                String nick = entry.getValue();
+                String name = entry.getKey().getName();
+                return (nick != null && lowerCaseInput.startsWith(nick.toLowerCase())) ||
+                    (name != null && lowerCaseInput.startsWith(name.toLowerCase()));
+            })
+            .findFirst()
+            .orElse(null);
     }
 
     private String getStrippedNickname(OfflinePlayer player) {
