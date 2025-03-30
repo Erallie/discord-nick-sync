@@ -10,6 +10,7 @@ import java.io.*;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -88,5 +89,9 @@ public class DataManager {
             return SyncMode.fromString(defaultMode);
         }
         return storedMode;
+    }
+
+    public Set<UUID> getAllSyncedPlayers() {
+        return syncPreferences.keySet();
     }
 }

@@ -133,8 +133,25 @@ public class MentionListener implements Listener {
             nick = player.getName();
             if (lowerCaseInput.startsWith(nick.toLowerCase())) {
                 return new AbstractMap.SimpleEntry<>(player, nick);
+            }
+        }
+        for (UUID uuid : plugin.getDataManager().getAllSyncedPlayers()) {
+            String nick = essentials.getUser(uuid).getNickname();
+
+            Player player = Bukkit.getPlayer(uuid);
+            if (nick == null || nick.isEmpty()) {
+                nick = player.getDisplayName();
             } else {
-                plugin.getLogger().info(lowerCaseInput + " " + player.getName().toLowerCase() + " " + nick);
+                nick = ChatColor.stripColor(nick);
+            }
+
+            String lowerCaseInput = input.toLowerCase();
+            if (lowerCaseInput.startsWith(nick.toLowerCase())) {
+                return new AbstractMap.SimpleEntry<>(player, nick);
+            }
+            nick = player.getName();
+            if (lowerCaseInput.startsWith(nick.toLowerCase())) {
+                return new AbstractMap.SimpleEntry<>(player, nick);
             }
         }
         return null;
