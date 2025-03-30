@@ -22,6 +22,7 @@ mentions:
   enabled: true
 
   # The sound that a player hears when they are mentioned.
+  # You must manually disable MinecraftMentionSound in DiscordSRV's config.yml if you don't want multiple sounds.
   play-sound:
     enabled: true
     # Can be any value listed here: https://minecraft.wiki/w/Sounds.json#Java_Edition_values
