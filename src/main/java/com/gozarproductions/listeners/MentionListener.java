@@ -24,6 +24,7 @@ import java.util.AbstractMap;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -185,7 +186,7 @@ public class MentionListener implements Listener {
                 }
                 return null;
             })
-            .filter(entry -> entry.getValue() != null)
+            .filter(Objects::nonNull)
             .sorted(Comparator.comparingInt((Map.Entry<OfflinePlayer, String> e) -> e.getValue().length()).reversed())
             .findFirst()
             .orElse(null);
