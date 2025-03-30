@@ -49,8 +49,8 @@ mentions:
       fade-out: 5
 
   # The color of the mention in chat.
-  # Can be any value listed here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/ChatColor.html#enum-constant-summary
-  color: YELLOW
+  # Set to "" to disable
+  color: "&e"
 
 updater:
   # Whether to notify admins for new snapshot releases. Admins will still be notified on stable releases.

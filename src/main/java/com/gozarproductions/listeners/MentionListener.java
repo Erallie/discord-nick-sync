@@ -74,11 +74,10 @@ public class MentionListener implements Listener {
 
         //#region Color config
         FileConfiguration config = plugin.getConfig();
-        ChatColor chatColor;
-        try {
-            chatColor = ChatColor.valueOf(config.getString("mentions.color", "WHITE").toUpperCase());
-        } catch (IllegalArgumentException e) {
-            chatColor = ChatColor.WHITE;
+        String chatColor = ChatColor.translateAlternateColorCodes('&', config.getString("mentions.color", "&e"));
+        String resetColor = "§r";
+        if (chatColor == null || chatColor.isEmpty()) {
+            resetColor = "";
         }
         //#endregion
 
@@ -156,7 +155,7 @@ public class MentionListener implements Listener {
                 }
             }
 
-            String replacement = chatColor + "@" + replacementName + ChatColor.RESET;
+            String replacement = chatColor + "@" + replacementName + resetColor;
 
             replacements.put(mention, replacement);
 
