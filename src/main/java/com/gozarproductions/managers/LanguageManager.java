@@ -16,6 +16,10 @@ public class LanguageManager {
     private FileConfiguration languageConfig;
     private final Map<String, String> cachedColors = new HashMap<>();
 
+    public Map<String, String> getCachedColors() {
+        return cachedColors;
+    }
+
     public LanguageManager(DiscordNickSync plugin) {
         this.plugin = plugin;
         loadLanguageFile();

@@ -118,8 +118,8 @@ public class DiscordNickSync extends JavaPlugin {
         String part2 = ": ";
         String part3 = " is null";
         LanguageManager languageManager = getLanguageManager();
-        String error = languageManager.getColor("error", true);
-        String errorHighlight = languageManager.getColor("error_highlight", true);
+        String error = languageManager.getCachedColors().get("e");
+        String errorHighlight = languageManager.getCachedColors().get("eh");
         
         getLogger().warning(part1 + playerName + part2 + variable + part3);
         if (notifySender != null) {
@@ -192,8 +192,8 @@ public class DiscordNickSync extends JavaPlugin {
             String part1 = "Did not sync nicknames for ";
             String part2 = " because they already match.";
             LanguageManager languageManager = getLanguageManager();
-            String defaultColor = languageManager.getColor("default", true);
-            String highlight = languageManager.getColor("highlight", true);
+            String defaultColor = languageManager.getCachedColors().get("d");
+            String highlight = languageManager.getCachedColors().get("h");
             
             getLogger().warning(part1 + minecraftNick + part2);
             if (notifySender != null) {
@@ -209,8 +209,8 @@ public class DiscordNickSync extends JavaPlugin {
         String to;
         String newNick;
         
-        String error = languageManager.getColor("error", true);
-        String errorHighlight = languageManager.getColor("error_highlight", true);
+        String error = languageManager.getCachedColors().get("e");
+        String errorHighlight = languageManager.getCachedColors().get("eh");
         
         switch (syncMode) {
             case MINECRAFT:
