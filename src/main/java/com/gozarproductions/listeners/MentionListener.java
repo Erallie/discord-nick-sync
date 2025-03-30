@@ -121,7 +121,7 @@ public class MentionListener implements Listener {
     public Map.Entry<Player, String> getPlayerByNickname(String input) {
         for (Player player : Bukkit.getOnlinePlayers()) {
             String nick = essentials.getUser(player).getNickname();
-            if (nick == null) {
+            if (nick == null || nick.isEmpty()) {
                 nick = player.getDisplayName();
             } else {
                 nick = ChatColor.stripColor(nick);
