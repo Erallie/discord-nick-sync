@@ -50,7 +50,7 @@ public class MentionListener implements Listener {
             chatColor = ChatColor.WHITE; // fallback if the color is invalid
         }
 
-        String soundName = config.getString("mentions.sound", "BLOCK_NOTE_BLOCK_BELL");
+        String soundName = config.getString("mentions.sound.sound", "BLOCK_NOTE_BLOCK_BELL");
         Sound sound;
 
         try {
