@@ -30,6 +30,22 @@ mentions:
     volume: 1.0
     # Any number between 0 and 2.
     pitch: 1.0
+  
+  send-title:
+    enabled: true
+    # Type {mentioner} for the nickname of the person who mentioned you
+    # Color formats are supported
+    title: "You have been mentioned"
+    # Type {mentioner} for the nickname of the person who mentioned you
+    # Color formats are supported
+    subtitle: "by {mentioner}"
+    duration:
+      # The duration in ticks for the title to fade in.
+      fade-in: 5
+      # The duration in ticks for the title to stay on the screen.
+      stay: 60
+      # The duration in ticks for the title to fade out.
+      fade-out: 5
 
   # The color of the mention in chat.
   # Can be any value listed here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/ChatColor.html#enum-constant-summary

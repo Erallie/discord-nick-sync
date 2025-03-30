@@ -76,6 +76,29 @@ public class MentionListener implements Listener {
         }
         //#endregion
 
+        //#region Title config
+        boolean sendTitle = config.getBoolean("mentions.send-title.enabled", true);
+        String title = null;
+        String subtitle = null;
+
+        int fadeIn = 0;
+        int stay = 0;
+        int fadeOut = 0;
+
+        if (sendTitle) {
+            Player mentioner = event.getPlayer();
+            String mentionerName = essentials.getUser(mentioner).getNickname();
+            if (mentionerName == null || mentionerName.isEmpty()) {
+                mentionerName = mentioner.getDisplayName();
+            }
+            title = ChatColor.translateAlternateColorCodes('&', config.getString("mentions.send-title.title", "You have been mentioned").replaceAll("\\{mentioner\\}", mentionerName));
+            subtitle = ChatColor.translateAlternateColorCodes('&', config.getString("mentions.send-title.subtitle", "by {mentioner}").replaceAll("\\{mentioner\\}", mentionerName));
+            fadeIn = config.getInt("mentions.send-title.duration.fade-in", 5);
+            stay = config.getInt("mentions.send-title.duration.stay", 60);
+            fadeOut = config.getInt("mentions.send-title.duration.fade-out", 5);
+        }
+        //#endregion
+
         String message = event.getMessage();
         if (!message.contains("@")) return;
         // event.setCancelled(true);
@@ -102,6 +125,10 @@ public class MentionListener implements Listener {
             if (player != null) {
                 if (sendSound) {
                     player.playSound(player.getLocation(), sound, SoundCategory.MASTER, volume, pitch);
+                }
+
+                if (sendTitle) {
+                    player.sendTitle(title, subtitle, fadeIn, stay, fadeOut);
                 }
             }
             //#endregion
