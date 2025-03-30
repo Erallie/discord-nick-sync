@@ -51,16 +51,24 @@ public class MentionListener implements Listener {
         } catch (IllegalArgumentException e) {
             chatColor = ChatColor.WHITE; // fallback if the color is invalid
         }
+        boolean sendSound = config.getBoolean("mentions.play-sound.enabled", true);
+        String soundName = null;
+        Sound sound = null;
+        float volume = 1.0f;
+        float pitch = 1.0f;
+        if (sendSound) {
+            soundName = config.getString("mentions.play-sound.sound", "block.note_block.bell");
 
-        String soundName = config.getString("mentions.sound.sound", "BLOCK_NOTE_BLOCK_BELL");
-        Sound sound;
+            try {
+                NamespacedKey namespacedKey = NamespacedKey.minecraft(soundName.toLowerCase());
+                sound = Registry.SOUNDS.get(namespacedKey);
+            } catch (Exception e) {
+                plugin.getLogger().warning("Invalid sound key: " + soundName);
+                sound = Sound.BLOCK_NOTE_BLOCK_BELL;
+            }
 
-        try {
-            NamespacedKey namespacedKey = NamespacedKey.minecraft(soundName.toLowerCase());
-            sound = Registry.SOUNDS.get(namespacedKey);
-        } catch (Exception e) {
-            plugin.getLogger().warning("Invalid sound key: " + soundName);
-            sound = Sound.BLOCK_NOTE_BLOCK_BELL;
+            volume = (float) config.getDouble("mentions.play-sound.volume", 1.0f);
+            pitch = (float) config.getDouble("mentions.play-sound.pitch", 1.0f);
         }
 
         String message = event.getMessage();
@@ -87,7 +95,9 @@ public class MentionListener implements Listener {
             //#region Alert Player
             //!TODO: add functionality for mentioning player
             if (player != null) {
-                player.playSound(player.getLocation(), sound, SoundCategory.MASTER, (float) config.getDouble("mentions.sound.volume"), (float) config.getDouble("mentions.sound.pitch"));
+                if (sendSound) {
+                    player.playSound(player.getLocation(), sound, SoundCategory.MASTER, volume, pitch);
+                }
             }
             //#endregion
 
