@@ -20,7 +20,7 @@ jobs:
                 set -e
 
                 echo "Preparing description payload..."
-                jq -Rs --arg body "$(cat README.md)" '{ body: $body }' > body.json
+                jq -Rs '{ body: . }' < README.md > body.json
 
                 echo "Sending PATCH request to Modrinth..."
 

@@ -60,16 +60,15 @@ jobs:
                     fi
                 fi
 
-                jq -n --arg name "$RELEASE_NAME" \
-                    --arg changelog "$changelog" \
+                jq -Rs --arg name "$RELEASE_NAME" \
                     --arg channel "$channel" \
                     --argjson featured "$featured" \
                     '{
                         name: $name,
-                        changelog: $changelog,
+                        changelog: .,
                         release_channel: $channel,
                         featured: $featured
-                    }' > update.json
+                    }' < changelog.txt > update.json
 
           - name: Patch Modrinth version info
             env:
