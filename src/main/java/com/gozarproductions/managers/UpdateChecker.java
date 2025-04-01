@@ -36,8 +36,22 @@ public class UpdateChecker {
 
                 // Parse JSON response
                 JsonObject json = JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
-                latestVersion = json.get("tag_name").getAsString().replace("v", ""); // Remove 'v' prefix if present
-                downloadUrl = json.get("html_url").getAsString();
+                String tagName = json.get("tag_name").getAsString();
+                latestVersion = tagName.replace("v", ""); // Remove 'v' prefix if present
+                String modrinthUrl = "https://modrinth.com/plugin/discord-nick-sync/version/" + tagName;
+                try {
+                    HttpURLConnection modrinthCheck = (HttpURLConnection) new URL(modrinthUrl).openConnection();
+                    modrinthCheck.setRequestMethod("HEAD");
+                    modrinthCheck.setInstanceFollowRedirects(false);
+                    int responseCode = modrinthCheck.getResponseCode();
+                    if (responseCode == 200) {
+                        downloadUrl = modrinthUrl;
+                    } else {
+                        downloadUrl = json.get("html_url").getAsString();
+                    }
+                } catch (Exception e) {
+                    downloadUrl = json.get("html_url").getAsString();
+                }
 
                 // Get current plugin version
                 currentVersion = plugin.getDescription().getVersion();
