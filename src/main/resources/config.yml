@@ -56,5 +56,5 @@ mentions:
   color: "&e"
 
 updater:
-  # Whether to notify admins for new snapshot releases. Admins will still be notified on stable releases.
+  # Whether to notify admins for new snapshot releases. Admins will still be notified on stable releases if this is set to "false".
   notify-on-dev-release: false
