@@ -2,10 +2,10 @@
 
 ---
 
-<a href="https://github.com/Erallie/discord-nick-sync/releases/latest" target="_blank">
+<a href="https://github.com/Erallie/discord-nick-sync" target="_blank">
 <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/Erallie/discord-nick-sync/total?style=for-the-badge&logo=github&logoColor=ffffff&label=GitHub%20Downloads&color=hsl(0%2C%200%25%2C%2020%25)">
 </a>
-<a href="https://modrinth.com/plugin/discord-nick-sync/version/latest" target="_blank">
+<a href="https://modrinth.com/plugin/discord-nick-sync" target="_blank">
 <img alt="Modrinth Downloads" src="https://img.shields.io/modrinth/dt/tles3bfw?style=for-the-badge&logo=modrinth&logoColor=00af5c&label=Modrinth%20Downloads&color=00af5c">
 </a>
 <br>
