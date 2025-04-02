@@ -73,9 +73,8 @@ public class ConfigUpdater {
             // Step 4: Set all user-defined keys back into the config
             for (String key : userConfig.getKeys(true)) {
                 Object value = userConfig.get(key);
-                if (value != null) {
-                    newConfig.set(key, value);
-                }
+                if (value instanceof org.bukkit.configuration.ConfigurationSection || value == null) continue;
+                newConfig.set(key, value);
             }
 
             // Step 5: Save final config with merged values
