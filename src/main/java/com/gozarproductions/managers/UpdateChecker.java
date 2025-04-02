@@ -17,17 +17,17 @@ public class UpdateChecker {
     private final DiscordNickSync plugin;
     private final String repoUrl; // GitHub API URL
     private final String repoName;
-    private final String updatePermission;
+    private final String notifyPermission;
     private boolean isLatest;
     private String latestVersion = null;
     private String currentVersion = null;
     private String downloadUrl = null;
 
-    public UpdateChecker(DiscordNickSync plugin, String repoOwner, String repoName, String updatePermission) {
+    public UpdateChecker(DiscordNickSync plugin, String repoOwner, String repoName, String notifyPermission) {
         this.plugin = plugin;
         this.repoUrl = "https://api.github.com/repos/" + repoOwner + "/" + repoName + "/releases/latest";
         this.repoName = repoName;
-        this.updatePermission = updatePermission;
+        this.notifyPermission = notifyPermission;
     }
 
     public void checkForUpdates() {
@@ -119,7 +119,7 @@ public class UpdateChecker {
      */
     private void notifyAdmins() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.hasPermission(updatePermission)) {
+            if (player.hasPermission(notifyPermission)) {
                 notify(player);
             }
         }
