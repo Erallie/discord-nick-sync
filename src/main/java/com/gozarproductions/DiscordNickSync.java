@@ -60,7 +60,7 @@ public class DiscordNickSync extends JavaPlugin {
         configUpdater.checkAndUpdateConfigs();
         
         // Run the Update Checker using GitHub API
-        updateChecker = new UpdateChecker(this, "Erallie", "discord-nick-sync");
+        updateChecker = new UpdateChecker(this, "Erallie", "discord-nick-sync", "discordnick.admin");
         updateChecker.checkForUpdates();
 
         reloadConfig();

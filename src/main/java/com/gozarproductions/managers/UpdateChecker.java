@@ -16,14 +16,18 @@ import java.net.URL;
 public class UpdateChecker {
     private final DiscordNickSync plugin;
     private final String repoUrl; // GitHub API URL
+    private final String repoName;
+    private final String updatePermission;
     private boolean isLatest;
     private String latestVersion = null;
     private String currentVersion = null;
     private String downloadUrl = null;
 
-    public UpdateChecker(DiscordNickSync plugin, String repoOwner, String repoName) {
+    public UpdateChecker(DiscordNickSync plugin, String repoOwner, String repoName, String updatePermission) {
         this.plugin = plugin;
         this.repoUrl = "https://api.github.com/repos/" + repoOwner + "/" + repoName + "/releases/latest";
+        this.repoName = repoName;
+        this.updatePermission = updatePermission;
     }
 
     public void checkForUpdates() {
@@ -38,7 +42,7 @@ public class UpdateChecker {
                 JsonObject json = JsonParser.parseReader(new InputStreamReader(connection.getInputStream())).getAsJsonObject();
                 String tagName = json.get("tag_name").getAsString();
                 latestVersion = tagName.replace("v", ""); // Remove 'v' prefix if present
-                String modrinthUrl = "https://modrinth.com/plugin/discord-nick-sync/version/" + tagName;
+                String modrinthUrl = "https://modrinth.com/plugin/" + repoName + "/version/" + tagName;
                 try {
                     HttpURLConnection modrinthCheck = (HttpURLConnection) new URL(modrinthUrl).openConnection();
                     modrinthCheck.setRequestMethod("HEAD");
@@ -115,7 +119,7 @@ public class UpdateChecker {
      */
     private void notifyAdmins() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.hasPermission("discordnick.admin")) {
+            if (player.hasPermission(updatePermission)) {
                 notify(player);
             }
         }
