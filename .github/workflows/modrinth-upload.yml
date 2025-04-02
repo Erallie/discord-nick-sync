@@ -16,8 +16,11 @@ jobs:
             run: |
                 echo "Fetching release info..."
                 api_url="https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ github.ref_name }}"
-                asset_info=$(curl -s -H "Authorization: token $GH_TOKEN" $api_url)
-                jar_name=$(echo "$asset_info" | jq -r '.assets[] | select(.name | endswith(".jar")) | .name' | head -n 1)
+                release_info=$(curl -s -H "Authorization: token $GH_TOKEN" "$api_url")
+                
+                echo "$release_info" | jq -r '.body' > changelog.txt
+
+                jar_name=$(echo "$release_info" | jq -r '.assets[] | select(.name | endswith(".jar")) | .name' | head -n 1)
 
                 if [ -z "$jar_name" ]; then
                     echo "No .jar asset found in release!"
@@ -38,8 +41,6 @@ jobs:
 
           - name: Prepare Modrinth metadata
             run: |
-                echo "${{ github.event.release.body }}" > changelog.txt
-
                 prerelease=${{ github.event.release.prerelease }}
                 if [ "$prerelease" = "true" ]; then
                     echo "🔶 Prerelease detected — setting to beta and not featured"
