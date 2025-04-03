@@ -1,0 +1,49 @@
+name: Modrinth Sync
+
+on:
+    release:
+        types: [published, edited, deleted]
+    push:
+        branches:
+            - main
+
+jobs:
+    upload-release:
+        if: github.event_name == 'release' && github.event.action == 'published'
+        uses: Erallie/modrinth-sync/.github/workflows/publish-release.yml@main
+        with:
+            project_id: "tles3bfw"
+            game_versions: '["1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4"]'
+            loaders: '["spigot", "paper", "purpur"]'
+            dependencies: >-
+                [
+                    { "version": "*", "project_id": "UmLGoGij", "dependency_type": "required" },
+                    { "version": "*", "project_id": "hXiIvTyT", "dependency_type": "required" }
+                ]
+        secrets:
+            MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+    
+    edit-release:
+        if: github.event_name == 'release' && github.event.action == 'edited'
+        uses: Erallie/modrinth-sync/.github/workflows/edit-release.yml@main
+        with:
+            project_id: "tles3bfw"
+        secrets:
+            MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+    
+    delete-release:
+        if: github.event_name == 'release' && github.event.action == 'deleted'
+        uses: Erallie/modrinth-sync/.github/workflows/delete-release.yml@main
+        with:
+            project_id: "tles3bfw"
+        secrets:
+            MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+
+    edit-project-description:
+        if: github.event_name == 'push'
+        uses: Erallie/modrinth-sync/.github/workflows/edit-project-description.yml@main
+        with:
+            project_id: "tles3bfw"
+        secrets:
+            MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+
