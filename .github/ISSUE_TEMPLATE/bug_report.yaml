@@ -49,9 +49,9 @@ body:
     validations:
       required: false
   - type: input
-    id: platform
+    id: server
     attributes:
-      label: server
+      label: Server version
       description: What server version are you experienceing this bug on?
       placeholder: "e.g. Purpur 1.21.4"
     validations:
